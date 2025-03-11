@@ -2,6 +2,7 @@ import { Roboto, Poppins } from "next/font/google";
 import "@/styles/globals.css";
 import Container from "@/utils/container";
 import Header from "@/components/header/header";
+import { ApiProvider } from "@/context/api-context";
 
 // import "@/styles/reset.css";
 
@@ -25,10 +26,12 @@ export default function RootLayout({ children }) {
   return (
     <html lang="tr">
       <body className={`${roboto.variable}  ${poppins.variable} antialiased`}>
-        <Container>
-          <Header />
-          {children}
-        </Container>
+        <ApiProvider>
+          <Container>
+            <Header />
+            {children}
+          </Container>
+        </ApiProvider>
       </body>
     </html>
   );
