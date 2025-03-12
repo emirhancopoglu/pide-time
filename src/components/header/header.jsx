@@ -6,7 +6,7 @@ export default function Header() {
   return (
     <>
       <div className="flex flex-row items-center justify-between py-2">
-        <a href="/">
+        <a href="/ara">
           <div className="w-[92px] h-auto">
             <Image
               src={HeaderLogo}

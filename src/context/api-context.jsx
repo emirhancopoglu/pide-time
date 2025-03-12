@@ -1,5 +1,6 @@
 "use client";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 const ApiContext = createContext();
@@ -7,11 +8,12 @@ const ApiContext = createContext();
 export const ApiProvider = ({ children }) => {
   const [cities, setCities] = useState([]);
   const [regions, setRegions] = useState([]);
-  const [selectedCities, setSelectedCities] = useState("");
-  const [selectedRegions, setSelectedRegions] = useState("");
-  const [selectedCitiesId, setSelectedCitiesId] = useState("");
+  const [selectedCity, setSelectedCity] = useState();
+  const [selectedRegion, setSelectedRegion] = useState();
+  const [selectedCityId, setSelectedCityId] = useState("");
   const [selectedRegionId, setSelectedRegionId] = useState("");
   const [times, setTimes] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     const getAllCities = async () => {
@@ -28,29 +30,30 @@ export const ApiProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (!selectedCities) return;
+    if (!selectedCity) return;
 
     const getCityId = async () => {
       try {
         const response = await axios.get(
-          `https://vakit.vercel.app/api/searchPlaces?q=${selectedCities}&lang=tr`
+          `https://vakit.vercel.app/api/searchPlaces?q=${selectedCity}&lang=tr`
         );
-        const city = response.data.find((city) => city.name === selectedCities);
+        const city = response.data.find((city) => city.name === selectedCity);
+
         if (city) {
-          setSelectedCitiesId(city.id);
+          setSelectedCityId(city.id);
         }
       } catch (error) {
         console.log("Şehir ID'si alınırken bir hata oluştu.", error);
       }
     };
     getCityId();
-  }, [selectedCities]);
+  }, [selectedCity]);
 
   useEffect(() => {
     const getCityRegion = async () => {
       try {
         const response = await axios.get(
-          `https://vakit.vercel.app/api/cities?country=Turkey&region=${selectedCities}`
+          `https://vakit.vercel.app/api/cities?country=Turkey&region=${selectedCity}`
         );
         setRegions(response.data);
       } catch (error) {
@@ -58,35 +61,51 @@ export const ApiProvider = ({ children }) => {
       }
     };
     getCityRegion();
-  }, [selectedCities]);
+  }, [selectedCity]);
 
   useEffect(() => {
     const getRegionId = async () => {
       try {
         const response = await axios.get(
-          `https://vakit.vercel.app/api/searchPlaces?q=${selectedRegions}&lang=tr`
+          `https://vakit.vercel.app/api/searchPlaces?q=${selectedRegion}&lang=tr`
         );
         const region = response.data.find(
-          (region) => region.name === selectedRegions
+          (region) => region.name === selectedRegion
         );
         if (region) {
           setSelectedRegionId(region.id);
         }
       } catch (error) {
-        console.log("Şehir ID'si alınırken bir hata oluştu.", error);
+        console.log("İlçe ID'si alınırken bir hata oluştu.", error);
       }
     };
     getRegionId();
-  }, [selectedRegions]);
+  }, [selectedRegion]);
+
+  useEffect(() => {
+    const savedTimes = localStorage.getItem("times");
+    const savedCity = localStorage.getItem("selectedCity");
+    const savedRegion = localStorage.getItem("selectedRegion");
+
+    if (savedTimes) setTimes(JSON.parse(savedTimes));
+    if (savedCity) setSelectedCity(savedCity);
+    if (savedRegion) setSelectedRegion(savedRegion);
+  }, []);
 
   const handleSearch = async () => {
-    if (!selectedCitiesId) {
+    if (!selectedCityId) {
       console.log("Şehir seçmelisiniz.");
       return;
     }
 
+    const path = selectedRegion
+      ? `/${selectedCity.toLowerCase()}-${selectedRegion.toLowerCase()}`
+      : `/${selectedCity.toLowerCase()}`;
+
+    router.push(`${path}?city=${selectedCity}&region=${selectedRegion || ""}`);
+
     try {
-      const cityOrRegionId = selectedRegionId || selectedCitiesId;
+      const cityOrRegionId = selectedRegionId || selectedCityId;
       const response = await axios.get(
         `https://vakit.vercel.app/api/timesForPlace?id=${cityOrRegionId}&timezoneOffset=180&calculationMethod=Turkey&lang=tr`
       );
@@ -98,6 +117,9 @@ export const ApiProvider = ({ children }) => {
       });
 
       setTimes(formattedTimes);
+      localStorage.setItem("times", JSON.stringify(formattedTimes));
+      localStorage.setItem("selectedCity", selectedCity);
+      localStorage.setItem("selectedRegion", selectedRegion || "");
     } catch (error) {
       console.log("Vakitler çekilirken bir hata oluştu.", error);
     }
@@ -109,15 +131,15 @@ export const ApiProvider = ({ children }) => {
         cities,
         regions,
         times,
-        selectedCities,
-        selectedRegions,
+        selectedCity,
+        selectedRegion,
         selectedRegionId,
-        selectedCitiesId,
-        setSelectedCities,
+        selectedCityId,
+        setSelectedCity,
         handleSearch,
-        setSelectedRegions,
-        setTimes, // Burayı eklediğinizden emin olun
-        setSelectedCitiesId,
+        setSelectedRegion,
+        setTimes,
+        setSelectedCityId,
         setSelectedRegionId,
       }}
     >
