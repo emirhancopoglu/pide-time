@@ -38,8 +38,8 @@ export default function CountdownPanel() {
           </div>
         </div>
         <div className="flex flex-col justify-center items-center my-4">
-          <p className="text-3xl font-bold">İFTARA KALAN SÜRE </p>
-          <p>TİMER</p>
+          <p className="text-3xl font-bold">KALAN SÜRE</p>
+          <p>remainingTime</p>
         </div>
       </div>
     </>
