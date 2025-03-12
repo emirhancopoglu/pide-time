@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 export default function Breadcrump() {
   const { selectedCity, setSelectedCity, setSelectedRegion } = useApiContext();
   const router = useRouter();
+
   const handleClearLocalStorage = () => {
     localStorage.removeItem("selectedRegion");
     localStorage.removeItem("selectedCity");

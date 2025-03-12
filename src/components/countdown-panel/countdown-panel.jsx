@@ -3,9 +3,11 @@ import { useApiContext } from "@/context/api-context";
 import { MapPin } from "lucide-react";
 import Breadcrump from "../breadcrump/breadcrump";
 import { formatDate } from "@/utils/date-format";
+import useCurrentTime from "@/utils/current-time";
 
 export default function CountdownPanel() {
   const { selectedCity, selectedRegion, times } = useApiContext();
+  const currentTime = useCurrentTime();
 
   return (
     <>
@@ -34,7 +36,7 @@ export default function CountdownPanel() {
           <div className="flex flex-col">
             {" "}
             <p> {times.length > 0 ? formatDate(times[0].date) : "2025"}</p>
-            <p className="text-end">currentTime</p>
+            <p className="text-end">{currentTime}</p>
           </div>
         </div>
         <div className="flex flex-col justify-center items-center my-4">
