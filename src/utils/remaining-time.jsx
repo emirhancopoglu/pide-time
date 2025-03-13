@@ -31,5 +31,10 @@ export const getRemainingTime = (targetTime) => {
   );
   const secondsLeft = Math.floor((correctedRemainingTime % (1000 * 60)) / 1000);
 
-  return `${hoursLeft} Saat ${minutesLeft} Dakika ${secondsLeft} Saniye`;
+  // Saat ve dakika değerlerini iki haneli olarak göstermek için padStart kullanıyoruz
+  const formattedHours = String(hoursLeft).padStart(2, "0");
+  const formattedMinutes = String(minutesLeft).padStart(2, "0");
+  const formattedSeconds = String(secondsLeft).padStart(2, "0");
+
+  return `${formattedHours} : ${formattedMinutes} : ${formattedSeconds}`;
 };

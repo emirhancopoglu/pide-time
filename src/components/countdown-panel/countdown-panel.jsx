@@ -39,11 +39,11 @@ export default function CountdownPanel() {
         </p>
       </div>
 
-      <div className="w-full border rounded-sm h-full mt-4 px-4 py-4">
+      <div className="w-full border rounded-sm h-full mt-4 px-4 py-4 bg-gradient-to-r from-sky-50 via-orange-100 to-yellow-50">
         <div className="flex w-full flex-row justify-between items-start">
           <div className="flex flex-row items-center gap-1">
             <MapPin size={20} strokeWidth={1} absoluteStrokeWidth />
-            <p className="font-[450]">
+            <p className="font-[500]">
               Türkiye /{" "}
               {selectedCity &&
                 (selectedRegion
@@ -53,41 +53,53 @@ export default function CountdownPanel() {
           </div>
           <div className="flex flex-col">
             {" "}
-            <p> {times.length > 0 ? formatDate(times[0].date) : "2025"}</p>
-            <p className="text-end">{currentTime}</p>
+            <p className="font-[500]">
+              {" "}
+              {times.length > 0 ? formatDate(times[0].date) : "2025"}
+            </p>
+            <p className="text-end font-[300]">{currentTime}</p>
           </div>
         </div>
 
-        <div className="w-full flex flex-col justify-center items-center my-4">
+        <div className="w-full flex flex-col justify-center items-center my-10">
           {isSahurPassed ? (
             <div className="w-full flex flex-col justify-center items-center">
               <p className="text-3xl font-bold">İFTARA KALAN SÜRE</p>
-              <p>{remainingIftarTime}</p>
+              <p className="text-3xl py-2 font-orbitron font-[500]">
+                {remainingIftarTime}
+              </p>
             </div>
           ) : isIftarPassed ? (
             <div className="w-full flex flex-col justify-center items-center">
               <p className="text-3xl font-bold">SAHURA KALAN SÜRE</p>
-              <p>{remainingSahurTime}</p>
+              <p className="text-3xl py-2 font-orbitron font-[500]">
+                {remainingSahurTime}
+              </p>
             </div>
           ) : (
             <div className="w-full flex flex-col justify-center items-center">
               <p className="text-3xl font-bold">SAHURA KALAN SÜRE</p>
-              <p className="text-3xl">{remainingSahurTime}</p>
+              <p className="text-3xl py-2 font-orbitron font-[500]">
+                {remainingSahurTime}
+              </p>
             </div>
           )}
         </div>
 
         <Separator />
-        <div className="flex flex-row justify-around px-4 py-8">
+        <div className="w-full flex flex-row justify-around px-4 py-8 max-md:gap-4 max-md:flex-col">
           {todayTimes?.map((item, index) => (
-            <div className=" flex flex-row gap-2  justify-center" key={index}>
-              <Separator orientation="vertical" />
+            <div
+              className="w-full flex flex-row gap-2 justify-center max-md:justify-between"
+              key={index}
+            >
+              <Separator orientation="vertical" className="max-md:hidden" />
               <div>{item.icon}</div>
-              <div className="text-center">
+              <div className="w-full text-center flex flex-col max-md:flex-row max-md:justify-between">
                 <p className="font-[450]">{item.time} </p>
                 <p className="font-[350]">{item.clock}</p>
               </div>
-              <Separator orientation="vertical" />
+              <Separator orientation="vertical" className="max-md:hidden" />
             </div>
           ))}
         </div>

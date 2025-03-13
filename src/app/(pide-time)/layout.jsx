@@ -1,4 +1,4 @@
-import { Roboto, Poppins } from "next/font/google";
+import { Roboto, Poppins, Orbitron } from "next/font/google";
 import "@/styles/globals.css";
 import Container from "@/utils/container";
 import Header from "@/components/header/header";
@@ -8,6 +8,10 @@ import { ApiProvider } from "@/context/api-context";
 
 const roboto = Roboto({
   variable: "--font-roboto",
+  subsets: ["latin"],
+});
+const orbitton = Orbitron({
+  variable: "--font-orbitton",
   subsets: ["latin"],
 });
 
@@ -25,7 +29,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="tr">
-      <body className={`${roboto.variable}  ${poppins.variable} antialiased`}>
+      <body
+        className={`${roboto.variable}  ${poppins.variable} ${orbitton.variable} antialiased`}
+      >
         <ApiProvider>
           <Container>
             <Header />
