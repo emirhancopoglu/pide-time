@@ -6,11 +6,26 @@ import { formatDate } from "@/utils/date-format";
 import useCurrentTime from "@/utils/current-time";
 import getPrayerTimes from "@/utils/get-prayer-times";
 import { Separator } from "@/components/ui/separator";
+import { getRemainingTime } from "@/utils/remaining-time";
 
 export default function CountdownPanel() {
   const { selectedCity, selectedRegion, times } = useApiContext();
   const currentTime = useCurrentTime();
   const todayTimes = getPrayerTimes(times);
+  const prayerTimes = getPrayerTimes(times);
+
+  const sahurTime = prayerTimes?.find(
+    (item) => item.time === "İmsak Vakti"
+  )?.clock;
+  const iftarTime = prayerTimes?.find(
+    (item) => item.time === "İftar Saati"
+  )?.clock;
+
+  const remainingSahurTime = getRemainingTime(sahurTime);
+  const remainingIftarTime = getRemainingTime(iftarTime);
+
+  const isSahurPassed = remainingSahurTime === "Zaman Geçti";
+  const isIftarPassed = remainingIftarTime === "Zaman Geçti";
 
   return (
     <>
@@ -43,10 +58,25 @@ export default function CountdownPanel() {
           </div>
         </div>
 
-        <div className="flex flex-col justify-center items-center my-4">
-          <p className="text-3xl font-bold">KALAN SÜRE</p>
-          <p>remainingTime</p>
+        <div className="w-full flex flex-col justify-center items-center my-4">
+          {isSahurPassed ? (
+            <div className="w-full flex flex-col justify-center items-center">
+              <p className="text-3xl font-bold">İFTARA KALAN SÜRE</p>
+              <p>{remainingIftarTime}</p>
+            </div>
+          ) : isIftarPassed ? (
+            <div className="w-full flex flex-col justify-center items-center">
+              <p className="text-3xl font-bold">SAHURA KALAN SÜRE</p>
+              <p>{remainingSahurTime}</p>
+            </div>
+          ) : (
+            <div className="w-full flex flex-col justify-center items-center">
+              <p className="text-3xl font-bold">SAHURA KALAN SÜRE</p>
+              <p className="text-3xl">{remainingSahurTime}</p>
+            </div>
+          )}
         </div>
+
         <Separator />
         <div className="flex flex-row justify-around px-4 py-8">
           {todayTimes?.map((item, index) => (
