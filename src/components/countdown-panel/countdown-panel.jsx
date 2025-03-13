@@ -1,13 +1,16 @@
 "use client";
 import { useApiContext } from "@/context/api-context";
 import { MapPin } from "lucide-react";
-import Breadcrump from "../breadcrump/breadcrump";
+import Breadcrump from "@/components/breadcrump/breadcrump";
 import { formatDate } from "@/utils/date-format";
 import useCurrentTime from "@/utils/current-time";
+import getPrayerTimes from "@/utils/get-prayer-times";
+import { Separator } from "@/components/ui/separator";
 
 export default function CountdownPanel() {
   const { selectedCity, selectedRegion, times } = useApiContext();
   const currentTime = useCurrentTime();
+  const todayTimes = getPrayerTimes(times);
 
   return (
     <>
@@ -39,9 +42,24 @@ export default function CountdownPanel() {
             <p className="text-end">{currentTime}</p>
           </div>
         </div>
+
         <div className="flex flex-col justify-center items-center my-4">
           <p className="text-3xl font-bold">KALAN SÜRE</p>
           <p>remainingTime</p>
+        </div>
+        <Separator />
+        <div className="flex flex-row justify-around px-4 py-8">
+          {todayTimes?.map((item, index) => (
+            <div className=" flex flex-row gap-2  justify-center" key={index}>
+              <Separator orientation="vertical" />
+              <div>{item.icon}</div>
+              <div className="text-center">
+                <p className="font-[450]">{item.time} </p>
+                <p className="font-[350]">{item.clock}</p>
+              </div>
+              <Separator orientation="vertical" />
+            </div>
+          ))}
         </div>
       </div>
     </>

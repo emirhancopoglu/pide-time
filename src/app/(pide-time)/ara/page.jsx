@@ -24,12 +24,15 @@ export default function Page() {
   return (
     <>
       <div className="w-full h-full flex justify-center mt-4 items-center">
-        <Card className="w-1/2 ">
+        <Card className="w-1/2 px-6 py-12 ">
           <CardHeader>
             <CardTitle className="text-2xl">İftar ve Sahur Saatleri</CardTitle>
           </CardHeader>
           <CardContent className="flex gap-2 flex-row">
-            <Select onValueChange={(value) => setSelectedCity(value)}>
+            <Select
+              onValueChange={(value) => setSelectedCity(value)}
+              className="cursor-pointer"
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="İl" />
               </SelectTrigger>
@@ -48,6 +51,7 @@ export default function Page() {
             <Select
               disabled={!selectedCity}
               onValueChange={(value) => setSelectedRegion(value)}
+              className="cursor-pointer"
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="İlçe" />
@@ -66,11 +70,15 @@ export default function Page() {
             </Select>
           </CardContent>
           <CardContent className="flex flex-row gap-2 w-full">
-            <Button onClick={handleSearch} className="w-1/2">
+            <Button
+              onClick={handleSearch}
+              className="w-1/2 cursor-pointer"
+              variant="outline"
+            >
               <LocateFixed />
               Otomatik Bul
             </Button>
-            <Button onClick={handleSearch} className="w-1/2">
+            <Button onClick={handleSearch} className="w-1/2 cursor-pointer">
               <MapPin />
               Ara
             </Button>

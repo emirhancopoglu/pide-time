@@ -3,8 +3,10 @@ import Image from "next/image";
 import ThemeChanger from "./theme-changer";
 import HeaderLogo from "@/assets/ramazanpidesi.png";
 import { useRouter } from "next/navigation";
+import { useApiContext } from "@/context/api-context";
 
 export default function Header() {
+  const { setSelectedCity, setSelectedRegion } = useApiContext();
   const router = useRouter();
 
   const handleClearLocalStorage = () => {
@@ -17,18 +19,19 @@ export default function Header() {
   };
   return (
     <>
-      <div className="flex flex-row items-center justify-between py-2">
-        <a onClick={handleClearLocalStorage}>
-          <div className="w-[92px] h-auto">
+      <header className="flex flex-row items-center justify-between py-2">
+        <div className="w-[92px] h-auto">
+          <a onClick={handleClearLocalStorage}>
             <Image
               src={HeaderLogo}
               alt="Pide Vakti"
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain cursor-pointer"
             />{" "}
-          </div>
-        </a>
+          </a>
+        </div>
+
         <ThemeChanger />
-      </div>
+      </header>
     </>
   );
 }
