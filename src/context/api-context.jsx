@@ -8,8 +8,8 @@ const ApiContext = createContext();
 export const ApiProvider = ({ children }) => {
   const [cities, setCities] = useState([]);
   const [regions, setRegions] = useState([]);
-  const [selectedCity, setSelectedCity] = useState();
-  const [selectedRegion, setSelectedRegion] = useState();
+  const [selectedCity, setSelectedCity] = useState(null);
+  const [selectedRegion, setSelectedRegion] = useState(null);
   const [selectedCityId, setSelectedCityId] = useState("");
   const [selectedRegionId, setSelectedRegionId] = useState("");
   const [times, setTimes] = useState([]);
@@ -41,6 +41,8 @@ export const ApiProvider = ({ children }) => {
 
         if (city) {
           setSelectedCityId(city.id);
+        } else {
+          setSelectedCityId("");
         }
       } catch (error) {
         console.log("Şehir ID'si alınırken bir hata oluştu.", error);
@@ -50,6 +52,8 @@ export const ApiProvider = ({ children }) => {
   }, [selectedCity]);
 
   useEffect(() => {
+    if (!selectedCity) return;
+
     const getCityRegion = async () => {
       try {
         const response = await axios.get(
@@ -64,6 +68,7 @@ export const ApiProvider = ({ children }) => {
   }, [selectedCity]);
 
   useEffect(() => {
+    if (!selectedRegion) return;
     const getRegionId = async () => {
       try {
         const response = await axios.get(
@@ -74,6 +79,8 @@ export const ApiProvider = ({ children }) => {
         );
         if (region) {
           setSelectedRegionId(region.id);
+        } else {
+          setSelectedRegionId("");
         }
       } catch (error) {
         console.log("İlçe ID'si alınırken bir hata oluştu.", error);
@@ -91,6 +98,12 @@ export const ApiProvider = ({ children }) => {
     if (savedCity) setSelectedCity(savedCity);
     if (savedRegion) setSelectedRegion(savedRegion);
   }, []);
+
+  useEffect(() => {
+    setSelectedRegion(null);
+    setSelectedRegionId("");
+    setRegions([]);
+  }, [selectedCity]);
 
   const handleSearch = async () => {
     if (!selectedCityId) {
