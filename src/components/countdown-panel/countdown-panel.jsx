@@ -11,13 +11,17 @@ import { getRemainingTime } from "@/utils/remaining-time";
 export default function CountdownPanel() {
   const { selectedCity, selectedRegion, times } = useApiContext();
   const currentTime = useCurrentTime();
-  const todayTimes = getPrayerTimes(times);
-  const prayerTimes = getPrayerTimes(times);
 
-  const sahurTime = prayerTimes?.find(
+  const today = new Date().toISOString().split("T")[0];
+
+  // Bugünün namaz vakitlerini bul
+  const todayData = times.find((item) => item.date === today);
+  const todayTimes = getPrayerTimes(todayData);
+
+  const sahurTime = todayTimes?.find(
     (item) => item.time === "İmsak Vakti"
   )?.clock;
-  const iftarTime = prayerTimes?.find(
+  const iftarTime = todayTimes?.find(
     (item) => item.time === "İftar Saati"
   )?.clock;
 
@@ -55,7 +59,7 @@ export default function CountdownPanel() {
             {" "}
             <p className="font-[500]">
               {" "}
-              {times.length > 0 ? formatDate(times[0].date) : "2025"}
+              {todayData ? formatDate(todayData.date) : "2025"}
             </p>
             <p className="text-end font-[300]">{currentTime}</p>
           </div>
@@ -78,9 +82,9 @@ export default function CountdownPanel() {
             </div>
           ) : (
             <div className="w-full flex flex-col justify-center items-center">
-              <p className="text-3xl font-bold">SAHURA KALAN SÜRE</p>
+              <p className="text-3xl font-bold">İFTARA KALAN SÜRE</p>
               <p className="text-3xl py-2 font-orbitron font-[500]">
-                {remainingSahurTime}
+                {remainingIftarTime}
               </p>
             </div>
           )}

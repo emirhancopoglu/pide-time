@@ -97,6 +97,8 @@ export const ApiProvider = ({ children }) => {
       console.log("Şehir seçmelisiniz.");
       return;
     }
+    console.log("selcetedcity", selectedCity);
+    console.log("selectedRegion:", selectedRegion);
 
     const path = selectedRegion
       ? `/${selectedCity.toLowerCase()}-${selectedRegion.toLowerCase()}`
@@ -107,7 +109,7 @@ export const ApiProvider = ({ children }) => {
     try {
       const cityOrRegionId = selectedRegionId || selectedCityId;
       const response = await axios.get(
-        `https://vakit.vercel.app/api/timesForPlace?id=${cityOrRegionId}&timezoneOffset=180&calculationMethod=Turkey&lang=tr`
+        `https://vakit.vercel.app/api/timesForPlace?id=${cityOrRegionId}&date=2025-03-01&days=30&timezoneOffset=180&calculationMethod=Turkey&lang=tr`
       );
 
       const allTimes = response.data.times;

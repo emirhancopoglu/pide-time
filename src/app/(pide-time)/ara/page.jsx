@@ -23,8 +23,8 @@ export default function Page() {
 
   return (
     <>
-      <div className="w-full h-full flex justify-center mt-4 items-center">
-        <Card className="w-1/2 px-6 py-12 ">
+      <div className="w-full  flex justify-center mt-4 items-center">
+        <Card className="w-1/2 h-full px-6 py-12 ">
           <CardHeader>
             <CardTitle className="text-2xl">İftar ve Sahur Saatleri</CardTitle>
           </CardHeader>

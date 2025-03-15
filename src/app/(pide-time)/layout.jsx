@@ -3,6 +3,7 @@ import "@/styles/globals.css";
 import Container from "@/utils/container";
 import Header from "@/components/header/header";
 import { ApiProvider } from "@/context/api-context";
+import Footer from "@/components/footer/footer";
 
 // import "@/styles/reset.css";
 
@@ -36,6 +37,7 @@ export default function RootLayout({ children }) {
           <Container>
             <Header />
             {children}
+            <Footer />
           </Container>
         </ApiProvider>
       </body>
