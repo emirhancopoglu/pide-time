@@ -66,25 +66,18 @@ export default function CountdownPanel() {
         </div>
 
         <div className="w-full flex flex-col justify-center items-center my-10">
-          {isSahurPassed ? (
+          {isIftarPassed ? (
             <div className="w-full flex flex-col justify-center items-center">
               <p className="text-3xl font-bold">İFTARA KALAN SÜRE</p>
               <p className="text-3xl py-2 font-orbitron font-[500]">
                 {remainingIftarTime}
-              </p>
-            </div>
-          ) : isIftarPassed ? (
-            <div className="w-full flex flex-col justify-center items-center">
-              <p className="text-3xl font-bold">SAHURA KALAN SÜRE</p>
-              <p className="text-3xl py-2 font-orbitron font-[500]">
-                {remainingSahurTime}
               </p>
             </div>
           ) : (
             <div className="w-full flex flex-col justify-center items-center">
-              <p className="text-3xl font-bold">İFTARA KALAN SÜRE</p>
+              <p className="text-3xl font-bold">SAHURA KALAN SÜRE</p>
               <p className="text-3xl py-2 font-orbitron font-[500]">
-                {remainingIftarTime}
+                {remainingSahurTime}
               </p>
             </div>
           )}
