@@ -1,5 +1,3 @@
-// utils/remaining-time.jsx
-
 export const getRemainingTime = (targetTime) => {
   if (!targetTime) return null;
 
@@ -14,9 +12,9 @@ export const getRemainingTime = (targetTime) => {
   targetDate.setMilliseconds(0);
 
   // Eğer hedef zaman geçmişse, bir sonraki günün saatini ayarlıyoruz
-  if (targetDate < now) {
-    targetDate.setDate(targetDate.getDate() + 1);
-  }
+  // if (targetDate < now) {
+  //   targetDate.setDate(targetDate.getDate() + 1);
+  // }
 
   const remainingTime = targetDate - now;
 

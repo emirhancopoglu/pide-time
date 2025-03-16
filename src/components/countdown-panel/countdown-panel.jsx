@@ -28,9 +28,6 @@ export default function CountdownPanel() {
   const remainingSahurTime = getRemainingTime(sahurTime);
   const remainingIftarTime = getRemainingTime(iftarTime);
 
-  const isSahurPassed = remainingSahurTime === "Zaman Geçti";
-  const isIftarPassed = remainingIftarTime === "Zaman Geçti";
-
   return (
     <>
       <Breadcrump />
@@ -65,22 +62,24 @@ export default function CountdownPanel() {
           </div>
         </div>
 
-        <div className="w-full flex flex-col justify-center items-center my-10">
-          {isIftarPassed ? (
-            <div className="w-full flex flex-col justify-center items-center">
-              <p className="text-3xl font-bold">İFTARA KALAN SÜRE</p>
-              <p className="text-3xl py-2 font-orbitron font-[500]">
-                {remainingIftarTime}
-              </p>
-            </div>
-          ) : (
-            <div className="w-full flex flex-col justify-center items-center">
-              <p className="text-3xl font-bold">SAHURA KALAN SÜRE</p>
-              <p className="text-3xl py-2 font-orbitron font-[500]">
-                {remainingSahurTime}
-              </p>
-            </div>
-          )}
+        <div className="w-full flex flex-row justify-center max-md:justify-between items-center my-10">
+          <div className="w-full flex flex-col justify-center items-center max-md:items-start">
+            <p className="text-3xl max-md:text-xl font-bold">
+              İFTARA KALAN SÜRE
+            </p>
+            <p className="text-3xl py-2 max-md:text-xl font-orbitron font-[500]">
+              {remainingIftarTime}
+            </p>
+          </div>
+
+          <div className="w-full flex flex-col justify-center items-center max-md:items-end">
+            <p className="text-3xl max-md:text-xl font-bold">
+              SAHURA KALAN SÜRE
+            </p>
+            <p className="text-3xl py-2 max-md:text-xl font-orbitron font-[500]">
+              {remainingSahurTime}
+            </p>
+          </div>
         </div>
 
         <Separator />

@@ -90,16 +90,6 @@ export const ApiProvider = ({ children }) => {
   }, [selectedRegion]);
 
   useEffect(() => {
-    const savedTimes = localStorage.getItem("times");
-    const savedCity = localStorage.getItem("selectedCity");
-    const savedRegion = localStorage.getItem("selectedRegion");
-
-    if (savedTimes) setTimes(JSON.parse(savedTimes));
-    if (savedCity) setSelectedCity(savedCity);
-    if (savedRegion) setSelectedRegion(savedRegion);
-  }, []);
-
-  useEffect(() => {
     setSelectedRegion(null);
     setSelectedRegionId("");
     setRegions([]);
@@ -139,6 +129,16 @@ export const ApiProvider = ({ children }) => {
       console.log("Vakitler çekilirken bir hata oluştu.", error);
     }
   };
+
+  useEffect(() => {
+    const savedTimes = localStorage.getItem("times");
+    const savedCity = localStorage.getItem("selectedCity");
+    const savedRegion = localStorage.getItem("selectedRegion");
+
+    if (savedTimes) setTimes(JSON.parse(savedTimes));
+    if (savedCity) setSelectedCity(savedCity);
+    if (savedRegion) setSelectedRegion(savedRegion);
+  }, []);
 
   return (
     <ApiContext.Provider
