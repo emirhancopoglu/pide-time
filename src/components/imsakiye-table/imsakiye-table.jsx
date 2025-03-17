@@ -2,7 +2,6 @@
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -28,12 +27,12 @@ export default function ImsakiyeTable() {
         <TableHeader>
           <TableRow>
             <TableHead className="text-center">Tarih</TableHead>
-            <TableHead className="text-center">İmsak Vakti</TableHead>
+            <TableHead className="text-center">İmsak</TableHead>
             <TableHead className="text-center">Güneş</TableHead>
-            <TableHead className="text-center">Öğle Ezanı</TableHead>
-            <TableHead className="text-center">İkindi Ezanı</TableHead>
-            <TableHead className="text-center">İftar Saati</TableHead>
-            <TableHead className="text-center">Teravih Vakti</TableHead>
+            <TableHead className="text-center">Öğle</TableHead>
+            <TableHead className="text-center">İkindi</TableHead>
+            <TableHead className="text-center">Akşam</TableHead>
+            <TableHead className="text-center">Yatsı</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

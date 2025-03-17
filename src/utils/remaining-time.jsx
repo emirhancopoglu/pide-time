@@ -1,38 +1,48 @@
-export const getRemainingTime = (targetTime) => {
-  if (!targetTime) return null;
+export const getRemainingTime = (sahurTime, iftarTime) => {
+  if (!sahurTime || !iftarTime) return null;
 
   const now = new Date();
-  const [hours, minutes] = targetTime.split(":").map(Number);
+  const [sahurHour, sahurMinute] = sahurTime.split(":").map(Number);
+  const [iftarHour, iftarMinute] = iftarTime.split(":").map(Number);
 
-  // Target Date nesnesini oluşturuyoruz
-  const targetDate = new Date(now);
-  targetDate.setHours(hours);
-  targetDate.setMinutes(minutes);
-  targetDate.setSeconds(0);
-  targetDate.setMilliseconds(0);
+  // Bugünün sahur ve iftar saatlerini belirle
+  const sahurDate = new Date(now);
+  sahurDate.setHours(sahurHour, sahurMinute, 0, 0);
 
-  // Eğer hedef zaman geçmişse, bir sonraki günün saatini ayarlıyoruz
-  // if (targetDate < now) {
-  //   targetDate.setDate(targetDate.getDate() + 1);
-  // }
+  const iftarDate = new Date(now);
+  iftarDate.setHours(iftarHour, iftarMinute, 0, 0);
 
-  const remainingTime = targetDate - now;
+  // Eğer şu an iftar saatleri arasındaysa (05:40 - 19:19)
+  if (now >= sahurDate && now < iftarDate) {
+    return {
+      type: "iftar",
+      time: formatRemainingTime(iftarDate - now),
+    };
+  }
 
-  if (remainingTime < 0) return "Zaman Geçti";
+  // Eğer şu an sahur saatleri arasındaysa (19:19 - 05:40)
+  if (now >= iftarDate || now < sahurDate) {
+    // Sahur zamanı geçmişse, sahur vaktine geri sayım başlat
+    const nextSahurDate = new Date(now);
+    nextSahurDate.setDate(now.getDate() + (now >= sahurDate ? 1 : 0));
+    nextSahurDate.setHours(sahurHour, sahurMinute, 0, 0);
 
-  // 1 dakika geriye çekiyoruz
-  const correctedRemainingTime = remainingTime - 60 * 1000; // 60 * 1000 ms = 1 dakika
+    return {
+      type: "sahur",
+      time: formatRemainingTime(nextSahurDate - now),
+    };
+  }
+};
 
-  const hoursLeft = Math.floor(correctedRemainingTime / (1000 * 60 * 60));
+// Yardımcı fonksiyon: Kalan zamanı formatlar
+const formatRemainingTime = (remainingTime) => {
+  const hoursLeft = Math.floor(remainingTime / (1000 * 60 * 60));
   const minutesLeft = Math.floor(
-    (correctedRemainingTime % (1000 * 60 * 60)) / (1000 * 60)
+    (remainingTime % (1000 * 60 * 60)) / (1000 * 60)
   );
-  const secondsLeft = Math.floor((correctedRemainingTime % (1000 * 60)) / 1000);
+  const secondsLeft = Math.floor((remainingTime % (1000 * 60)) / 1000);
 
-  // Saat ve dakika değerlerini iki haneli olarak göstermek için padStart kullanıyoruz
-  const formattedHours = String(hoursLeft).padStart(2, "0");
-  const formattedMinutes = String(minutesLeft).padStart(2, "0");
-  const formattedSeconds = String(secondsLeft).padStart(2, "0");
-
-  return `${formattedHours} : ${formattedMinutes} : ${formattedSeconds}`;
+  return `${String(hoursLeft).padStart(2, "0")} : ${String(
+    minutesLeft
+  ).padStart(2, "0")} : ${String(secondsLeft).padStart(2, "0")}`;
 };

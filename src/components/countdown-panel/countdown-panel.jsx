@@ -18,16 +18,19 @@ export default function CountdownPanel() {
   const todayData = times.find((item) => item.date === today);
   const todayTimes = getPrayerTimes(todayData);
 
-  const sahurTime = todayTimes?.find(
-    (item) => item.time === "İmsak Vakti"
-  )?.clock;
-  const iftarTime = todayTimes?.find(
-    (item) => item.time === "İftar Saati"
-  )?.clock;
+  const sahurTime = todayTimes?.find((item) => item.time === "İmsak")?.clock;
+  const iftarTime = todayTimes?.find((item) => item.time === "Akşam")?.clock;
 
-  const remainingSahurTime = getRemainingTime(sahurTime);
-  const remainingIftarTime = getRemainingTime(iftarTime);
+  const remainingSahur = getRemainingTime(sahurTime, iftarTime);
+  const remainingIftar = getRemainingTime(sahurTime, iftarTime);
 
+  // Doğru zaman tipine göre kalan süreyi belirle
+  const remainingSahurTime =
+    remainingSahur?.type === "sahur" ? remainingSahur.time : "00:00:00";
+  const remainingIftarTime =
+    remainingIftar?.type === "iftar" ? remainingIftar.time : "00:00:00";
+
+  console.log(getRemainingTime(sahurTime, iftarTime));
   return (
     <>
       <Breadcrump />
