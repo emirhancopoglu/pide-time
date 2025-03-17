@@ -12,7 +12,7 @@ import { formatDate } from "@/utils/date-format";
 
 export default function ImsakiyeTable() {
   const { selectedCity, selectedRegion, times } = useApiContext();
-  console.log("times: ", times);
+
   const today = new Date().toISOString().split("T")[0];
   return (
     <div className="mt-4">

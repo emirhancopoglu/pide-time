@@ -4,7 +4,7 @@ import Container from "@/utils/container";
 import Header from "@/components/header/header";
 import { ApiProvider } from "@/context/api-context";
 import Footer from "@/components/footer/footer";
-
+import { ThemeProvider } from "next-themes";
 // import "@/styles/reset.css";
 
 const roboto = Roboto({
@@ -29,16 +29,25 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="tr">
+    <html lang="tr" suppressHydrationWarning>
       <body
         className={`${roboto.variable}  ${poppins.variable} ${orbitton.variable} antialiased`}
       >
         <ApiProvider>
-          <Container>
-            <Header />
-            {children}
-            <Footer />
-          </Container>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Container>
+              <Header />
+
+              {children}
+
+              <Footer />
+            </Container>
+          </ThemeProvider>
         </ApiProvider>
       </body>
     </html>

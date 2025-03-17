@@ -100,12 +100,10 @@ export const ApiProvider = ({ children }) => {
       console.log("Şehir seçmelisiniz.");
       return;
     }
-    console.log("selcetedcity", selectedCity);
-    console.log("selectedRegion:", selectedRegion);
 
     const path = selectedRegion
-      ? `/${selectedCity.toLowerCase()}-${selectedRegion.toLowerCase()}`
-      : `/${selectedCity.toLowerCase()}`;
+      ? `/${selectedCity?.toLowerCase()}-${selectedRegion?.toLowerCase()}`
+      : `/${selectedCity?.toLowerCase()}`;
 
     router.push(`${path}?city=${selectedCity}&region=${selectedRegion || ""}`);
 

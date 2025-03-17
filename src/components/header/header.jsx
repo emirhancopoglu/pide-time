@@ -17,6 +17,7 @@ export default function Header() {
     setSelectedRegion(null);
     router.push("/ara");
   };
+
   return (
     <>
       <header className="flex flex-row items-center justify-between py-2">
