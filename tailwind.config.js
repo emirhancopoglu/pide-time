@@ -6,6 +6,7 @@ module.exports = {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./node_modules/@shadcn/ui/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
@@ -15,5 +16,14 @@ module.exports = {
       },
     },
   },
+  safelist: [
+    {
+      pattern:
+        /(bg|text|border|shadow)-(red|blue|green|yellow|gray)-(100|200|300|400|500|600)/,
+    },
+    {
+      pattern: /(p|m|h|w|gap|flex|grid)-[0-9]/,
+    },
+  ],
   plugins: [],
 };
