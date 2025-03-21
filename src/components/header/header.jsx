@@ -20,7 +20,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="flex flex-row items-center justify-between py-2">
+      <header className="flex flex-row items-center justify-between py-2 border-b ">
         <div className="w-[92px] h-auto">
           <a onClick={handleClearLocalStorage}>
             <Image
@@ -30,7 +30,9 @@ export default function Header() {
             />{" "}
           </a>
         </div>
-
+        <p className="text-orange-200 font-inter text-4xl font-semibold stroke-custom font-orbitron">
+          Pide Vakti
+        </p>
         <ThemeChanger />
       </header>
     </>

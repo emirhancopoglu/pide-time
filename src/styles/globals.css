@@ -187,3 +187,8 @@ body {
 .font-orbitron {
   font-family: "Orbitron", sans-serif;
 }
+
+.stroke-custom {
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #828282;
+}

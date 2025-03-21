@@ -13,7 +13,10 @@ import { formatDate } from "@/utils/date-format";
 export default function ImsakiyeTable() {
   const { selectedCity, selectedRegion, times } = useApiContext();
 
-  const today = new Date().toISOString().split("T")[0];
+  const now = new Date();
+  now.setHours(now.getHours() + 3);
+  const today = now.toISOString().split("T")[0];
+
   return (
     <div className="mt-4">
       <h1 className="flex flex-row gap-1 text-xl font-semibold">

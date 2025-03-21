@@ -12,7 +12,9 @@ export default function CountdownPanel() {
   const { selectedCity, selectedRegion, times } = useApiContext();
   const currentTime = useCurrentTime();
 
-  const today = new Date().toISOString().split("T")[0];
+  const now = new Date();
+  now.setHours(now.getHours() + 3);
+  const today = now.toISOString().split("T")[0];
 
   // Bugünün namaz vakitlerini bul
   const todayData = times.find((item) => item.date === today);
@@ -33,14 +35,14 @@ export default function CountdownPanel() {
   return (
     <>
       <Breadcrump />
-      <div className="w-full flex flex-row justify-between items-center mt-4">
+      {/* <div className="w-full flex flex-row justify-between items-center mt-4">
         <p className="font-semibold text-3xl">
           {selectedCity &&
             (selectedRegion
               ? `${selectedCity}, ${selectedRegion}`
               : selectedCity)}
         </p>
-      </div>
+      </div> */}
 
       <div className="w-full border rounded-sm h-full mt-4 px-4 py-4 ">
         <div className="flex w-full flex-row justify-between items-start">
