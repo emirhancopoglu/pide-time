@@ -5,7 +5,7 @@ import { FaLinkedin } from "react-icons/fa";
 export default function Footer() {
   return (
     <>
-      <footer className="border-t mt-4 px-4 py-4 text-end flex flex-row justify-between">
+      <footer className="border-t border-gray-300  dark:border-gray-600 mt-4 px-4 py-4 text-end flex flex-row justify-between">
         <p className="text-sm font-[300]">
           Developed by {""}
           <Link href="mailto:copogluemirhan@outlook.com" target="_blank">

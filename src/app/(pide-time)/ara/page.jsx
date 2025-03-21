@@ -24,7 +24,7 @@ export default function Page() {
   return (
     <>
       <div className="w-full  h-full  flex justify-center mt-4 items-center">
-        <Card className="w-1/2  max-md:w-full h-full px-6 py-16 ">
+        <Card className="w-1/2 max-md:w-full h-full px-6 py-16 border-gray-300  dark:border-gray-600">
           <CardHeader>
             <CardTitle className="text-2xl">İftar ve Sahur Saatleri</CardTitle>
           </CardHeader>
@@ -36,7 +36,7 @@ export default function Page() {
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="İl" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="border border-gray-300  dark:border-gray-600">
                 {cities.length > 0 ? (
                   cities.map((city, index) => (
                     <SelectItem key={index} value={city}>
@@ -56,7 +56,7 @@ export default function Page() {
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="İlçe" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="border border-gray-300  dark:border-gray-600">
                 {regions.length > 0 ? (
                   regions.map((regions, index) => (
                     <SelectItem key={index} value={regions}>

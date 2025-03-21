@@ -44,7 +44,7 @@ export default function CountdownPanel() {
         </p>
       </div> */}
 
-      <div className="w-full border rounded-sm h-full mt-4 px-4 py-4 ">
+      <div className="w-full border border-gray-300  dark:border-gray-600 rounded-sm h-full mt-4 px-4 py-4 ">
         <div className="flex w-full flex-row justify-between items-start">
           <div className="flex flex-row items-center gap-1 ">
             <MapPin size={20} strokeWidth={1} absoluteStrokeWidth />

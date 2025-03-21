@@ -20,7 +20,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="flex flex-row items-center justify-between py-2 border-b ">
+      <header className="flex flex-row items-center justify-between py-2 border-b border-gray-300  dark:border-gray-600">
         <div className="w-[92px] h-auto">
           <a onClick={handleClearLocalStorage}>
             <Image
