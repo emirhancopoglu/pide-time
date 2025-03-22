@@ -9,17 +9,73 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useApiContext } from "@/context/api-context";
+import axios from "axios";
 import { LocateFixed, MapPin } from "lucide-react";
+import { useEffect } from "react";
 
 export default function Page() {
   const {
     cities,
     regions,
     selectedCity,
+    selectedRegion,
     setSelectedCity,
     setSelectedRegion,
     handleSearch,
   } = useApiContext();
+
+  const handleAutoLocate = async () => {
+    if (!navigator.geolocation) {
+      console.log("Tarayıcınız konum hizmetlerini desteklemiyor.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        console.log("Konum bilgisi alındı:", latitude, longitude);
+
+        try {
+          // Ters geokodlama için bir API kullanabilirsiniz
+          const response = await axios.get(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+          );
+
+          const city =
+            response.data.address?.city || response.data.address?.state;
+          const region =
+            response.data.address?.suburb || response.data.address?.town;
+
+          if (city) setSelectedCity(city);
+
+          if (region) setSelectedRegion(region);
+
+          console.log("Şehir:", city, "İlçe:", region);
+
+          // Ardından arama yap
+          handleSearch();
+        } catch (error) {
+          console.log("Ters geokodlama yapılırken bir hata oluştu:", error);
+        }
+      },
+      (error) => {
+        console.log("Konum alınamadı:", error.message);
+      },
+      { enableHighAccuracy: true }
+    );
+  };
+
+  useEffect(() => {
+    if (selectedCity && selectedCity !== "null") {
+      localStorage.setItem("selectedCity", selectedCity);
+    }
+  }, [selectedCity]);
+
+  useEffect(() => {
+    if (selectedRegion && selectedRegion !== "null") {
+      localStorage.setItem("selectedRegion", selectedRegion);
+    }
+  }, [selectedRegion]);
 
   return (
     <>
@@ -71,7 +127,7 @@ export default function Page() {
           </CardContent>
           <CardContent className="flex flex-row gap-2 w-full">
             <Button
-              onClick={handleSearch}
+              onClick={handleAutoLocate}
               className="w-1/2 cursor-pointer"
               variant="outline"
             >

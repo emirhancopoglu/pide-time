@@ -120,9 +120,14 @@ export const ApiProvider = ({ children }) => {
       });
 
       setTimes(formattedTimes);
+
+      if (selectedCity && selectedCity !== "null") {
+        localStorage.setItem("selectedCity", selectedCity);
+      }
+      if (selectedRegion && selectedRegion !== "null") {
+        localStorage.setItem("selectedRegion", selectedRegion || "");
+      }
       localStorage.setItem("times", JSON.stringify(formattedTimes));
-      localStorage.setItem("selectedCity", selectedCity);
-      localStorage.setItem("selectedRegion", selectedRegion || "");
     } catch (error) {
       console.log("Vakitler çekilirken bir hata oluştu.", error);
     }
