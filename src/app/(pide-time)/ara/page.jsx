@@ -1,5 +1,6 @@
 "use client";
 import AccordionComponent from "@/components/accordion/accordion";
+import BannerComponent from "@/components/banner/banner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -80,8 +81,8 @@ export default function Page() {
 
   return (
     <>
-      <div className="w-full  h-full  flex justify-center mt-4 items-center gap-2">
-        <Card className="w-1/2 max-md:w-full h-full px-6 py-16 border-gray-300  dark:border-gray-600">
+      <div className="w-full h-full flex justify-center mt-4 items-center gap-2 max-md:flex-col">
+        <Card className="w-1/2 max-md:w-full h-full py-16 border-gray-300  dark:border-gray-600">
           <CardHeader>
             <CardTitle className="text-2xl">İftar ve Sahur Saatleri</CardTitle>
           </CardHeader>
@@ -141,10 +142,11 @@ export default function Page() {
             </Button>
           </CardContent>
         </Card>
-        {/* Kullanılan API yazılacak buraya  */}
 
         <AccordionComponent />
       </div>
+      {/* Kullanılan API yazılacak buraya  */}
+      <BannerComponent />
     </>
   );
 }

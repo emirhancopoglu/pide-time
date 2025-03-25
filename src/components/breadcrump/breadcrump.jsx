@@ -27,7 +27,7 @@ export default function Breadcrump() {
 
   return (
     <>
-      <Breadcrumb className="mt-12 cursor-pointer">
+      <Breadcrumb className="mt-6 cursor-pointer">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink onClick={handleClearLocalStorage}>

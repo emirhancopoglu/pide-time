@@ -8,7 +8,7 @@ import {
 export default function AccordionComponent() {
   return (
     <>
-      <Accordion type="single" collapsible className="w-1/2">
+      <Accordion type="single" collapsible className="w-1/2 max-md:w-full">
         <AccordionItem value="item-1">
           <AccordionTrigger>
             Ramazan'da sahurda hangi yemekler tercih edilmeli?
