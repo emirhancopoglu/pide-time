@@ -1,5 +1,6 @@
 "use client";
 import axios from "axios";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
@@ -97,7 +98,7 @@ export const ApiProvider = ({ children }) => {
 
   const handleSearch = async () => {
     if (!selectedCityId) {
-      console.log("Şehir seçmelisiniz.");
+      toast.info("Şehir seçmelisin!");
       return;
     }
 
@@ -110,7 +111,7 @@ export const ApiProvider = ({ children }) => {
     try {
       const cityOrRegionId = selectedRegionId || selectedCityId;
       const response = await axios.get(
-        `https://vakit.vercel.app/api/timesForPlace?id=${cityOrRegionId}&date=2025-03-01&days=30&timezoneOffset=180&calculationMethod=Turkey&lang=tr`
+        `https://vakit.vercel.app/api/timesForPlace?id=${cityOrRegionId}&date=2025-03-01&days=29&timezoneOffset=180&calculationMethod=Turkey&lang=tr`
       );
 
       const allTimes = response.data.times;
@@ -127,7 +128,12 @@ export const ApiProvider = ({ children }) => {
       if (selectedRegion && selectedRegion !== "null") {
         localStorage.setItem("selectedRegion", selectedRegion || "");
       }
-      localStorage.setItem("times", JSON.stringify(formattedTimes));
+
+      if (formattedTimes && formattedTimes.length > 0) {
+        localStorage.setItem("times", JSON.stringify(formattedTimes));
+      } else {
+        localStorage.removeItem("times");
+      }
     } catch (error) {
       console.log("Vakitler çekilirken bir hata oluştu.", error);
     }

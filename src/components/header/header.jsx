@@ -15,6 +15,7 @@ export default function Header() {
     localStorage.removeItem("times");
     setSelectedCity(null);
     setSelectedRegion(null);
+
     router.push("/ara");
   };
 

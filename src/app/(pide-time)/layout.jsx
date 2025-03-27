@@ -1,10 +1,11 @@
 import { Roboto, Poppins, Orbitron } from "next/font/google";
+import { ThemeProvider } from "next-themes";
+import Header from "@/components/header/header";
+import Footer from "@/components/footer/footer";
+import { Toaster } from "@/components/ui/sonner";
+import { ApiProvider } from "@/context/api-context";
 import "@/styles/globals.css";
 import Container from "@/utils/container";
-import Header from "@/components/header/header";
-import { ApiProvider } from "@/context/api-context";
-import Footer from "@/components/footer/footer";
-import { ThemeProvider } from "next-themes";
 // import "@/styles/reset.css";
 
 const roboto = Roboto({
@@ -44,6 +45,7 @@ export default function RootLayout({ children }) {
               <Header />
 
               {children}
+              <Toaster richColors position="top-center" closeButton />
 
               <Footer />
             </Container>
