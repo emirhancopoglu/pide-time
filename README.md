@@ -5,6 +5,8 @@ Ramazan ayı için yapılmış, şehir veya şehir, ilçe üzerinden sahur ve if
 
 NextJS ile geliştirilen bu projede, sabit tasarım prensipleriyle Shadcn UI kullandım. Kullanıcılar şehir veya şehir, ilçe seçerek iftar ve sahur zamanlarını görebilme imkanı sağlanıyor. API olarak vakit.vercel.app tarafına istek atılıyor ve dinamik olarak zamanlar çekiliyor. Light ve Dark theme desteği bulunmaktadır.
 
+**Not: Verileri, saatleri API'dan aldığım için saatlerde 1-2 dakikalık oynamalar olabilir. Component'leri ShadCN UI'dan kullandığım için mobil görünümlerde responsive ve CSS hataları olabilir. ShadCN UI, CSS bug'ı fixlediğinde düzelecektir.**
+
 
 ## Demo
 
