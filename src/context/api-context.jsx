@@ -108,10 +108,14 @@ export const ApiProvider = ({ children }) => {
 
     router.push(`${path}?city=${selectedCity}&region=${selectedRegion || ""}`);
 
+    //Hangi ay içindeysek o ayı alır.
+    const currentDate = new Date();
+    const currentYYMMDD = currentDate.toISOString().split("T")[0]; // YYYY-MM-DD formatında alırız
+
     try {
       const cityOrRegionId = selectedRegionId || selectedCityId;
       const response = await axios.get(
-        `https://vakit.vercel.app/api/timesForPlace?id=${cityOrRegionId}&date=2025-03-01&days=29&timezoneOffset=180&calculationMethod=Turkey&lang=tr`
+        `https://vakit.vercel.app/api/timesForPlace?id=${cityOrRegionId}&date=${currentYYMMDD}&days=29&timezoneOffset=180&calculationMethod=Turkey&lang=tr`
       );
 
       const allTimes = response.data.times;
