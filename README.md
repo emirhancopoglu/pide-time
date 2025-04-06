@@ -25,7 +25,8 @@ Kullanılan API = https://vakit.vercel.app/
 
 * selectedCity = Istanbul
 * selectedRegion = Sultanbeyli
-* cityOrRegionId =  311922 || 311914 
+* cityOrRegionId =  311922 || 311914
+* ${currentYYMMDD} = Güncel yy-mm-dd
 
 #### Tüm şehirleri getir
 ```bash
@@ -50,7 +51,7 @@ Kullanılan API = https://vakit.vercel.app/
 #### Belirtilen ID'nin imsak vakitlerini getir
 ```bash
   GET 
-  https://vakit.vercel.app/api/timesForPlace?id=${cityOrRegionId}&date=2025-03-01&days=30&timezoneOffset=180&calculationMethod=Turkey&lang=tr
+  https://vakit.vercel.app/api/timesForPlace?id=${cityOrRegionId}&date=${currentYYMMDD}&days=30&timezoneOffset=180&calculationMethod=Turkey&lang=tr
 ```
 
 ## Ekran Görüntüleri
