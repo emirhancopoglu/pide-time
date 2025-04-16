@@ -22,7 +22,16 @@ module.exports = {
         /(bg|text|border|shadow)-(red|blue|green|yellow|gray)-(100|200|300|400|500|600)/,
     },
     {
-      pattern: /(p|m|h|w|gap|flex|grid)-[0-9]/,
+      pattern: /(p|m|h|w|gap|flex|grid)-(.*)/,
+    },
+    {
+      pattern: /flex-(col|row|wrap|nowrap|1|auto)/,
+    },
+    {
+      pattern: /items-(start|center|end|stretch)/,
+    },
+    {
+      pattern: /justify-(start|center|between|end)/,
     },
   ],
   plugins: [],
