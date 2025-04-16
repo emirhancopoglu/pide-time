@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { ApiProvider } from "@/context/api-context";
 import "@/styles/globals.css";
 import Container from "@/utils/container";
+import Head from "next/head";
 // import "@/styles/reset.css";
 
 const roboto = Roboto({
@@ -31,6 +32,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="tr" suppressHydrationWarning>
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
       <body
         className={`${roboto.variable}  ${poppins.variable} ${orbitton.variable} antialiased`}
       >
@@ -48,6 +52,12 @@ export default function RootLayout({ children }) {
               <Toaster richColors position="top-center" closeButton />
 
               <Footer />
+              <Head>
+                <meta
+                  name="viewport"
+                  content="width=device-width, initial-scale=1"
+                />
+              </Head>
             </Container>
           </ThemeProvider>
         </ApiProvider>
