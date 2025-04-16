@@ -48,7 +48,11 @@ export default function CountdownPanel() {
       <div className="w-full border border-gray-300  dark:border-gray-600 rounded-sm h-full mt-4 px-4 py-4 ">
         <div className="flex w-full flex-row justify-between items-start">
           <div className="flex flex-row items-center gap-1">
-            <MapPin size={20} strokeWidth={1} absoluteStrokeWidth />
+            <MapPin
+              size={25}
+              absoluteStrokeWidth
+              className="text-sky-600 bg-gray-800 rounded-full p-1 shrink"
+            />
             <p className="font-[500]">
               Türkiye /{" "}
               {selectedCity &&
@@ -67,7 +71,7 @@ export default function CountdownPanel() {
           </div>
         </div>
 
-        <div className="w-full flex flex-row justify-center max-md:justify-between max-md:flex-col items-center my-10">
+        <div className="w-full flex flex-row justify-center max-sm:flex-col max-md:flex-col items-center my-10">
           <div className="w-full flex flex-col justify-center items-center max-md:items-center">
             <p className="text-3xl max-md:text-2xl font-bold">
               İFTARA KALAN SÜRE

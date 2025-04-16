@@ -11,7 +11,7 @@ export default function AccordionComponent() {
       <Accordion
         type="single"
         collapsible
-        className="flex flex-col w-1/2 max-md:w-full max-md:px-6"
+        className="flex flex-col w-1/2 max-sm:w-full max-md:w-full max-md:px-6"
       >
         <AccordionItem value="item-1">
           <AccordionTrigger>

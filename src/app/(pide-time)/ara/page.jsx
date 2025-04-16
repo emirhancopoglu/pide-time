@@ -81,8 +81,8 @@ export default function Page() {
 
   return (
     <>
-      <div className="w-full h-full flex flex-row justify-center mt-4 items-center gap-2 max-md:flex-col">
-        <Card className="w-1/2 flex flex-col max-md:w-full h-full py-16 border-gray-300  dark:border-gray-600">
+      <div className="w-full h-full flex flex-row justify-center mt-4 items-center gap-2 max-sm:flex-col max-md:flex-col">
+        <Card className="flex flex-col max-sm:w-full max-md:w-full h-full py-16 border-gray-300  dark:border-gray-600">
           <CardHeader>
             <CardTitle className="text-2xl max-md:text-center">
               İftar ve Sahur Saatleri
