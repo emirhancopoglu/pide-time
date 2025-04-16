@@ -67,9 +67,9 @@ export default function CountdownPanel() {
           </div>
         </div>
 
-        <div className="w-full flex flex-row justify-center max-md:justify-between items-center my-10">
-          <div className="w-full flex flex-col justify-center items-center max-md:items-start">
-            <p className="text-3xl max-md:text-xl font-bold">
+        <div className="w-full flex flex-row justify-center max-md:justify-between max-md:flex-col items-center my-10">
+          <div className="w-full flex flex-col justify-center items-center max-md:items-center">
+            <p className="text-3xl max-md:text-2xl font-bold">
               İFTARA KALAN SÜRE
             </p>
             <p className="text-3xl py-2 max-md:text-xl font-orbitron font-[500]">
@@ -77,8 +77,8 @@ export default function CountdownPanel() {
             </p>
           </div>
 
-          <div className="w-full flex flex-col justify-center items-center max-md:items-end max-md:text-end">
-            <p className="text-3xl max-md:text-xl font-bold">
+          <div className="w-full flex flex-col justify-center items-center max-md:items-center max-md:text-end">
+            <p className="text-3xl max-md:text-2xl font-bold">
               SAHURA KALAN SÜRE
             </p>
             <p className="text-3xl py-2 max-md:text-xl font-orbitron font-[500]">
@@ -88,7 +88,7 @@ export default function CountdownPanel() {
         </div>
 
         <Separator />
-        <div className="w-full flex flex-row  justify-around px-4 py-8 max-md:gap-4 max-sm:flex-col max-md:flex-col ">
+        <div className="flex flex-row w-full justify-around px-4 py-8 max-sm:flex-col max-md:gap-4 max-md:flex-col">
           {todayTimes?.map((item, index) => (
             <div
               className=" flex flex-row gap-4 justify-center max-md:justify-between"

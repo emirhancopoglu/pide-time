@@ -22,7 +22,7 @@ export default function Header() {
   return (
     <>
       <header className="flex flex-row items-center justify-between py-2 border-b border-gray-300  dark:border-gray-600">
-        <div className="w-[92px] h-auto">
+        <div className="w-20 h-auto">
           <a onClick={handleClearLocalStorage}>
             <Image
               src={HeaderLogo}
@@ -31,7 +31,7 @@ export default function Header() {
             />{" "}
           </a>
         </div>
-        <p className="text-orange-200 font-inter text-4xl font-semibold stroke-custom font-orbitron">
+        <p className="text-orange-200 font-inter text-4xl font-semibold stroke-custom font-orbitron max-md:text-3xl">
           Pide Vakti
         </p>
         <ThemeChanger />
