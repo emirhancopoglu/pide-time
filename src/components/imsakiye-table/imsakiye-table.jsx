@@ -45,8 +45,8 @@ export default function ImsakiyeTable() {
             return (
               <TableRow
                 className={`text-center ${
-                  isToday ? "text-green-600 font-bold" : ""
-                } ${isPast ? "line-through" : ""}`}
+                  isToday && "text-green-600 font-bold"
+                } ${isPast && "line-through"}`}
                 key={index}
               >
                 <TableCell className="font-semibold">

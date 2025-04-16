@@ -12,55 +12,49 @@ const getPrayerTimes = (todayData) => {
     {
       time: "İmsak",
       icon: (
-        <Sunrise
-          className="flex-shrink-0 text-yellow-500 bg-gray-800 rounded-full p-1"
-          size={30}
-        />
+        <div className="flex-shrink-0 text-yellow-500 bg-gray-800 rounded-full p-1">
+          <Sunrise size={24} />
+        </div>
       ),
     },
     {
       time: "Güneş",
       icon: (
-        <Sun
-          className="flex-shrink-0 text-yellow-300 bg-gray-800 rounded-full p-1"
-          size={30}
-        />
+        <div className="flex-shrink-0 text-yellow-300 bg-gray-800 rounded-full p-1">
+          <Sun size={24} />
+        </div>
       ),
     },
     {
       time: "Öğle",
       icon: (
-        <SunMedium
-          className="flex-shrink-0 text-yellow-400 bg-gray-800 rounded-full p-1"
-          size={30}
-        />
+        <div className="flex-shrink-0 text-yellow-400 bg-gray-800 rounded-full p-1">
+          <SunMedium size={24} />
+        </div>
       ),
     },
     {
       time: "İkindi",
       icon: (
-        <SunDim
-          className="flex-shrink-0 text-yellow-500 bg-gray-800 rounded-full p-1"
-          size={30}
-        />
+        <div className="flex-shrink-0 text-yellow-500 bg-gray-800 rounded-full p-1">
+          <SunDim size={24} />
+        </div>
       ),
     },
     {
       time: "Akşam",
       icon: (
-        <Sunset
-          className="flex-shrink-0 text-orange-600 bg-gray-800 rounded-full p-1"
-          size={30}
-        />
+        <div className="flex-shrink-0 text-orange-600 bg-gray-800 rounded-full p-1">
+          <Sunset size={24} />
+        </div>
       ),
     },
     {
       time: "Yatsı",
       icon: (
-        <Moon
-          className="flex-shrink-0 text-sky-600 bg-gray-800 rounded-full p-1"
-          size={30}
-        />
+        <div className="flex-shrink-0 text-sky-600 bg-gray-800 rounded-full p-1">
+          <Moon size={24} />
+        </div>
       ),
     },
   ];

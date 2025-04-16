@@ -7,7 +7,6 @@ import useCurrentTime from "@/utils/current-time";
 import getPrayerTimes from "@/utils/get-prayer-times";
 import { Separator } from "@/components/ui/separator";
 import { getRemainingTime } from "@/utils/remaining-time";
-import { useEffect } from "react";
 
 export default function CountdownPanel() {
   const { selectedCity, selectedRegion, times } = useApiContext();
@@ -89,7 +88,7 @@ export default function CountdownPanel() {
         </div>
 
         <Separator />
-        <div className="w-full flex flex-row  justify-around px-4 py-8 max-md:gap-4 max-md:flex-col ">
+        <div className="w-full flex flex-row  justify-around px-4 py-8 max-md:gap-4 max-sm:flex-col max-md:flex-col ">
           {todayTimes?.map((item, index) => (
             <div
               className=" flex flex-row gap-4 justify-center max-md:justify-between"
