@@ -12,7 +12,7 @@ export default function AccordionComponent() {
         type="single"
         collapsible
         className={
-          "flex flex-col w-1/2 max-sm:w-full max-md:w-full max-md:px-6"
+          "flex flex-col w-1/2 accordionMobile max-sm:w-full max-md:w-full max-md:px-6"
         }
       >
         <AccordionItem value="item-1">

@@ -81,10 +81,10 @@ export default function Page() {
 
   return (
     <>
-      <div className="w-full h-full flex flex-row justify-center mt-4 items-center gap-2 mobileResponsive max-sm:flex-col max-md:flex-col ">
+      <div className="w-full h-full flex flex-row justify-center mt-4 items-center gap-2 mobileResponsive max-sm:flex-col max-md:flex-col">
         <Card
           className={
-            "flex flex-col max-sm:w-full max-md:w-full h-full py-16 border-gray-300  dark:border-gray-600"
+            "flex flex-col w-1/2 cardMobile max-sm:w-full max-md:w-full h-full py-16 border-gray-300  dark:border-gray-600"
           }
         >
           <CardHeader>
