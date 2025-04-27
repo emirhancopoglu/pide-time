@@ -92,7 +92,7 @@ export default function Page() {
               İftar ve Sahur Saatleri
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex gap-2 flex-row max-md:flex-col">
+          <CardContent className="flex gap-2 flex-row max-sm:flex-col cardMobileInput max-md:flex-col">
             <Select
               onValueChange={(value) => setSelectedCity(value)}
               className="cursor-pointer"
