@@ -194,3 +194,10 @@ body {
   -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: #828282;
 }
+
+@media screen and (max-width: 600px) {
+  .mobileResponsive {
+    display: flex;
+    flex-direction: column;
+  }
+}

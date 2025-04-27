@@ -3,7 +3,6 @@ import AccordionComponent from "@/components/accordion/accordion";
 import BannerComponent from "@/components/banner/banner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 import {
   Select,
   SelectContent,
@@ -82,7 +81,7 @@ export default function Page() {
 
   return (
     <>
-      <div className="w-full h-full flex flex-row justify-center mt-4 items-center gap-2 max-sm:flex-col max-md:flex-col">
+      <div className="w-full h-full flex flex-row justify-center mt-4 items-center gap-2 mobileResponsive max-sm:flex-col max-md:flex-col ">
         <Card
           className={
             "flex flex-col max-sm:w-full max-md:w-full h-full py-16 border-gray-300  dark:border-gray-600"
