@@ -209,4 +209,12 @@ body {
     display: flex;
     flex-direction: column;
   }
+  .panelMobile {
+    display: flex;
+    flex-direction: column;
+  }
+  .panelMobileTimes {
+    display: flex;
+    flex-direction: row;
+  }
 }

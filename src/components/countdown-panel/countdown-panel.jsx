@@ -71,7 +71,7 @@ export default function CountdownPanel() {
           </div>
         </div>
 
-        <div className="w-full flex flex-row justify-center max-sm:flex-col max-md:flex-col items-center my-10">
+        <div className="w-full flex flex-row justify-center panelMobile max-sm:flex-col max-md:flex-col items-center my-10">
           <div className="w-full flex flex-col justify-center items-center max-md:items-center">
             <p className="text-3xl max-md:text-2xl font-bold">
               İFTARA KALAN SÜRE
@@ -92,7 +92,7 @@ export default function CountdownPanel() {
         </div>
 
         <Separator />
-        <div className="flex flex-row w-full justify-around px-4 py-8 max-sm:flex-col max-md:gap-4 max-md:flex-col">
+        <div className="flex flex-row w-full justify-around panelMobile px-4 py-8 max-sm:flex-col max-md:gap-4 max-md:flex-col">
           {todayTimes?.map((item, index) => (
             <div
               className=" flex flex-row gap-4 justify-center max-md:justify-between"
