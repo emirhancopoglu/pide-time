@@ -6,6 +6,7 @@ import { saveLastLocation } from "@/lib/last-location";
 import SkyArc from "@/components/sky-arc/sky-arc";
 import ReminderButton from "@/components/reminder-button/reminder-button";
 import ShareButton from "@/components/share-button/share-button";
+import CalendarButton from "@/components/calendar-button/calendar-button";
 import {
   PRAYERS,
   RAMAZAN_MONTH,
@@ -131,6 +132,7 @@ export default function CountdownPanel({ days, place }) {
             </dl>
             <div className="flex flex-wrap items-center gap-2">
               <ReminderButton iftarAt={status?.iftar.at} sahurAt={status?.sahur.at} placeName={place.label} />
+              <CalendarButton days={days} place={place} />
               <ShareButton title={`${place.label} iftar ve sahur vakitleri`} />
             </div>
           </div>

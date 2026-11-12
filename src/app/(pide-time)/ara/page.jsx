@@ -1,7 +1,9 @@
 import Link from "next/link";
 import AccordionComponent from "@/components/accordion/accordion";
+import CityIftars from "@/components/city-iftars/city-iftars";
 import LivePreview from "@/components/live-preview/live-preview";
 import LocationPicker from "@/components/location-picker/location-picker";
+import { getCityIftars } from "@/lib/cities";
 import { getIlceler, getIller, getVakitler } from "@/lib/diyanet";
 import { findCenterDistrict } from "@/lib/turkish";
 
@@ -40,7 +42,7 @@ async function loadPreview() {
 }
 
 export default async function Page() {
-  const preview = await loadPreview();
+  const [preview, cities] = await Promise.all([loadPreview(), getCityIftars()]);
 
   return (
     <>
@@ -81,9 +83,11 @@ export default async function Page() {
         </div>
       </section>
 
+      {cities.length > 1 && <CityIftars cities={cities} className="mt-16 lg:mt-24" />}
+
       <section
         aria-labelledby="sss-title"
-        className="mt-20 grid gap-6 border-t border-border pt-10 lg:mt-28 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14"
+        className="mt-16 grid gap-6 lg:mt-24 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14"
       >
         <div>
           <h2 id="sss-title" className="font-display text-3xl font-semibold tracking-tight">

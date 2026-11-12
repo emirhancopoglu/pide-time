@@ -7,7 +7,9 @@ NextJS ile geliştirilen bu projede, sabit tasarım prensipleriyle Shadcn UI kul
 
 **Tasarım:** Geri sayım büyük, okunur bir cümle olarak gösterilir ("İftara 2 saat 14 dakika var."). Yanındaki **gün yayı** imsaktan iftara (gece fazında iftardan imsaka) uzanır; güneş ya da ay şu anki konumda durur, ara vakitler yay üzerinde işaretlidir (`src/components/sky-arc`). Renkler: kâğıt `#F4F5F7`, çivit mürekkep `#191B33`, alacakaranlık `#3F3DBC` (vurgu), gün batımı `#F2683A` (güneş ve iftar), gece `#1D2050`. Yazı tipleri Funnel Display ve Funnel Sans.
 
-**Ek özellikler:** iftar ve sahurdan 15 dakika önce tarayıcı bildirimi (sekme açıkken), paylaş butonu, Ramazan sayacı (Ramazan'ın kaçıncı günü ya da Ramazan'a kalan gün), iftardan sonraki 45 dakika "Hayırlı iftarlar" mesajı, ana sayfada İstanbul'un canlı önizlemesi ve büyükşehir kısayolları, son bakılan konumun hatırlanması.
+**Logo:** ufukta batan bir Ramazan pidesi (pide batınca iftar). Bileşen `src/components/logo`, favicon `src/app/icon.svg`.
+
+**Ek özellikler:** iftar ve sahurdan 15 dakika önce tarayıcı bildirimi (sekme açıkken), 30 günlük vakitleri alarmlı `.ics` olarak takvime ekleme, oruç süresi grafiği, 12 ilde bugünkü iftarı karşılaştıran nokta grafiği, paylaş butonu, Ramazan sayacı (Ramazan'ın kaçıncı günü ya da Ramazan'a kalan gün), iftardan sonraki 45 dakika "Hayırlı iftarlar" mesajı, ana sayfada İstanbul'un canlı önizlemesi ve büyükşehir kısayolları, son bakılan konumun hatırlanması.
 
 
 ## Demo

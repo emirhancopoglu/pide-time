@@ -1,7 +1,11 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
+import CityIftars from "@/components/city-iftars/city-iftars";
 import CountdownPanel from "@/components/countdown-panel/countdown-panel";
+import FastingChart from "@/components/fasting-chart/fasting-chart";
 import ImsakiyeTable from "@/components/imsakiye-table/imsakiye-table";
 import RamazanMeter from "@/components/ramazan-meter/ramazan-meter";
+import { getCityIftars } from "@/lib/cities";
 import { getVakitler, resolvePlace } from "@/lib/diyanet";
 import { formatLongDate, todayKey } from "@/lib/prayer-times";
 import { districtLabel } from "@/lib/turkish";
@@ -27,6 +31,12 @@ export async function generateMetadata({ params }) {
   };
 }
 
+/** Şehir karşılaştırması ayrı yüklenir; sayfanın geri kalanını bekletmez. */
+async function CityComparison({ current }) {
+  const cities = await getCityIftars();
+  return <CityIftars cities={cities} current={current} />;
+}
+
 export default async function Page({ params }) {
   const { il, ilce } = await loadPage(params);
   const days = await getVakitler(ilce.id);
@@ -38,6 +48,14 @@ export default async function Page({ params }) {
     label: placeLabel(il, ilce),
   };
   const today = days.find((day) => day.date === todayKey());
+
+  // Karşılaştırmada bu ilçe kendi adıyla vurgulanır; il merkeziyse listedeki ilin satırı vurgulanır.
+  const isCenter = districtLabel(il, ilce) === "Merkez";
+  const current = {
+    name: isCenter ? il.name : ilce.name,
+    slug: isCenter ? il.slug : `${il.slug}-${ilce.slug}`,
+    days: days.map((day) => ({ date: day.date, aksam: day.times.aksam })),
+  };
 
   return (
     <div className="flex flex-col gap-10 pt-8 sm:pt-12">
@@ -54,7 +72,16 @@ export default async function Page({ params }) {
       {days.length > 0 ? (
         <>
           <CountdownPanel days={days} place={place} />
-          <RamazanMeter days={days} />
+
+          <div className="grid items-start gap-6 lg:grid-cols-2">
+            <div className="flex flex-col gap-6">
+              <FastingChart days={days} />
+              <RamazanMeter days={days} />
+            </div>
+            <Suspense fallback={<div className="min-h-96 animate-pulse rounded-3xl bg-card" aria-hidden />}>
+              <CityComparison current={current} />
+            </Suspense>
+          </div>
           <ImsakiyeTable days={days} />
         </>
       ) : (

@@ -43,7 +43,7 @@ export default function RootLayout({ children }) {
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <div className="flex min-h-dvh flex-col">
             <Header />
-            <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-20 sm:px-6">{children}</main>
+            <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-20 sm:px-6 lg:px-8 lg:px-8">{children}</main>
             <Footer />
           </div>
           <Toaster position="top-center" closeButton />

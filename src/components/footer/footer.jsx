@@ -4,7 +4,7 @@ import { FaGithub, FaLinkedin } from "react-icons/fa";
 export default function Footer() {
   return (
     <footer className="border-t border-border">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-6 text-[0.95rem] text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-6 text-[0.95rem] text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8 lg:px-8">
         <div className="space-y-1">
           <p>
             Vakitler Diyanet İşleri Başkanlığı verilerinden alınır (

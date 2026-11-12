@@ -16,7 +16,7 @@ export default function RamazanMeter({ days }) {
   if (today?.hijriMonth === RAMAZAN_MONTH) {
     const dayNo = parseInt(today.hijri, 10);
     return (
-      <section aria-labelledby="ramazan-title" className="rounded-2xl bg-card p-5 sm:p-6">
+      <section aria-labelledby="ramazan-title" className="rounded-3xl bg-card p-5 sm:p-7">
         <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
           <h2 id="ramazan-title" className="font-display text-xl font-semibold sm:text-2xl">
             Ramazan&apos;ın {dayNo}. günü
@@ -49,7 +49,7 @@ export default function RamazanMeter({ days }) {
   return (
     <section
       aria-labelledby="ramazan-title"
-      className="flex flex-col gap-1 rounded-2xl bg-card p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6"
+      className="flex flex-col gap-1 rounded-3xl bg-card p-5 sm:p-7"
     >
       <h2 id="ramazan-title" className="font-display text-xl font-semibold sm:text-2xl">
         Ramazan&apos;a {next.exact ? "" : "yaklaşık "}

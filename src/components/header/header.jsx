@@ -1,15 +1,14 @@
-import Image from "next/image";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
-import HeaderLogo from "@/assets/ramazanpidesi.png";
+import Logo from "@/components/logo/logo";
 import ThemeChanger from "./theme-changer";
 
 export default function Header() {
   return (
     <header>
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
+      <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 lg:px-8">
         <Link href="/ara" className="flex items-center gap-2.5 rounded-md" aria-label="Pide Vakti ana sayfa">
-          <Image src={HeaderLogo} alt="" priority className="h-8 w-auto" />
+          <Logo className="h-8 w-auto" />
           <span className="font-display text-xl font-semibold tracking-tight">Pide Vakti</span>
         </Link>
 
