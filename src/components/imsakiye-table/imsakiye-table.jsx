@@ -1,68 +1,93 @@
 "use client";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { useApiContext } from "@/context/api-context";
-import { formatDate } from "@/utils/date-format";
+import { cn } from "@/lib/utils";
+import { useNow } from "@/lib/use-now";
+import { PRAYERS, RAMAZAN_MONTH, formatShortDate, todayKey } from "@/lib/prayer-times";
 
-export default function ImsakiyeTable() {
-  const { selectedCity, selectedRegion, times } = useApiContext();
-
-  const now = new Date();
-  now.setHours(now.getHours() + 3);
-  const today = now.toISOString().split("T")[0];
+export default function ImsakiyeTable({ days }) {
+  // Dakikada bir yeterli; gün dönünce bugün satırı kendiliğinden kayar.
+  const now = useNow(60_000);
+  const today = now ? todayKey(now) : null;
+  const rows = today ? days.filter((day) => day.date >= today) : days;
+  const hasRamazan = rows.some((day) => day.hijriMonth === RAMAZAN_MONTH);
 
   return (
-    <div className="mt-4">
-      <h1 className="flex flex-row gap-1 text-xl font-semibold">
-        {selectedCity &&
-          (selectedRegion
-            ? `${selectedCity}, ${selectedRegion}`
-            : selectedCity)}
-        <p> Ramazan İmsakiyesi</p>
-      </h1>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="text-center">Tarih</TableHead>
-            <TableHead className="text-center">İmsak</TableHead>
-            <TableHead className="text-center">Güneş</TableHead>
-            <TableHead className="text-center">Öğle</TableHead>
-            <TableHead className="text-center">İkindi</TableHead>
-            <TableHead className="text-center">Akşam</TableHead>
-            <TableHead className="text-center">Yatsı</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {times.map((day, index) => {
-            const isToday = day.date === today; // Bugünün tarihiyle eşleşme kontrolü
-            const isPast = day.date < today;
-            return (
-              <TableRow
-                className={`text-center ${
-                  isToday && "text-green-600 font-bold"
-                } ${isPast && "line-through"}`}
-                key={index}
-              >
-                <TableCell className="font-semibold">
-                  {formatDate(day.date)}
-                </TableCell>
-                <TableCell>{day.times[0]}</TableCell> {/* İmsak */}
-                <TableCell>{day.times[1]}</TableCell> {/* Güneş */}
-                <TableCell>{day.times[2]}</TableCell> {/* Öğle */}
-                <TableCell>{day.times[3]}</TableCell> {/* İkindi */}
-                <TableCell>{day.times[4]}</TableCell> {/* İftar */}
-                <TableCell>{day.times[5]}</TableCell> {/* Teravih */}
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </div>
+    <section className="flex flex-col gap-4" aria-labelledby="imsakiye-title">
+      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-1">
+        <div>
+          <h2 id="imsakiye-title" className="font-display text-2xl font-semibold">
+            {hasRamazan ? "Ramazan imsakiyesi" : "İmsakiye"}
+          </h2>
+          <p className="text-muted-foreground">Önümüzdeki {rows.length} günün vakitleri</p>
+        </div>
+        {hasRamazan && (
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span className="size-2 rounded-full bg-sunset" /> Ramazan günleri
+          </p>
+        )}
+      </div>
+
+      <div className="overflow-hidden rounded-2xl bg-card">
+        <div className="overflow-x-auto">
+          <table className="figures w-full min-w-[40rem]">
+            <thead>
+              <tr className="border-b border-border text-sm text-muted-foreground">
+                <th scope="col" className="sticky left-0 z-10 bg-card px-5 py-3.5 text-left font-medium">
+                  Tarih
+                </th>
+                {PRAYERS.map((prayer) => (
+                  <th key={prayer.key} scope="col" className="px-3 py-3.5 text-right font-medium last:pr-5">
+                    {prayer.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((day) => {
+                const isToday = day.date === today;
+                const isRamazan = day.hijriMonth === RAMAZAN_MONTH;
+                return (
+                  <tr
+                    key={day.date}
+                    aria-current={isToday ? "date" : undefined}
+                    className={cn("border-t border-border first:border-t-0", isToday && "bg-now")}
+                  >
+                    <th
+                      scope="row"
+                      className={cn(
+                        "sticky left-0 z-10 px-5 py-3 text-left font-normal whitespace-nowrap",
+                        isToday ? "bg-now" : "bg-card"
+                      )}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <span
+                          className={cn("size-1.5 shrink-0 rounded-full", isRamazan ? "bg-sunset" : "bg-transparent")}
+                          role={isRamazan ? "img" : undefined}
+                          aria-label={isRamazan ? "Ramazan günü" : undefined}
+                        />
+                        <span className={cn(isToday && "font-semibold")}>{formatShortDate(day.date)}</span>
+                        {isToday && <span className="text-sm text-accent-foreground">bugün</span>}
+                      </span>
+                    </th>
+                    {PRAYERS.map((prayer) => (
+                      <td
+                        key={prayer.key}
+                        className={cn(
+                          "px-3 py-3 text-right last:pr-5",
+                          prayer.key === "aksam" && "font-semibold text-sunset-ink",
+                          prayer.key === "imsak" && "font-semibold",
+                          prayer.key !== "aksam" && prayer.key !== "imsak" && !isToday && "text-muted-foreground"
+                        )}
+                      >
+                        {day.times[prayer.key]}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
   );
 }

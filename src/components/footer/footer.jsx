@@ -1,35 +1,55 @@
 import Link from "next/link";
-import { FaGithub } from "react-icons/fa";
-import { FaLinkedin } from "react-icons/fa";
+import { FaGithub, FaLinkedin } from "react-icons/fa";
 
 export default function Footer() {
   return (
-    <>
-      <footer className="border-t border-gray-300  dark:border-gray-600 mt-4 px-4 py-4 text-end flex flex-row justify-between">
-        <p className="text-sm font-[300]">
-          Developed by {""}
-          <Link href="mailto:copogluemirhan@outlook.com" target="_blank">
-            <span className="underline font-[400]">Emirhan Çöpoğlu </span>
-          </Link>
-        </p>
-        <div className="flex flex-row gap-1">
+    <footer className="border-t border-border">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-6 text-[0.95rem] text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div className="space-y-1">
+          <p>
+            Vakitler Diyanet İşleri Başkanlığı verilerinden alınır (
+            <Link
+              href="https://ezanvakti.emushaf.net"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-4 hover:text-foreground"
+            >
+              ezanvakti.emushaf.net
+            </Link>
+            ).
+          </p>
+          <p>
+            Geliştiren{" "}
+            <Link
+              href="mailto:copogluemirhan@outlook.com"
+              className="font-medium text-foreground underline-offset-4 hover:underline"
+            >
+              Emirhan Çöpoğlu
+            </Link>
+          </p>
+        </div>
+
+        <div className="flex items-center gap-1">
           <Link
             href="https://github.com/emirhancopoglu"
             target="_blank"
-            className=""
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+            className="grid size-9 place-items-center rounded-md transition-colors hover:text-foreground"
           >
-            <FaGithub size={20} className="flex-shrink-0" />
+            <FaGithub className="size-5" />
           </Link>
-
           <Link
             href="https://www.linkedin.com/in/emirhancopoglu/"
             target="_blank"
-            className=""
+            rel="noopener noreferrer"
+            aria-label="LinkedIn"
+            className="grid size-9 place-items-center rounded-md transition-colors hover:text-foreground"
           >
-            <FaLinkedin size={20} className="flex-shrink-0" />
+            <FaLinkedin className="size-5" />
           </Link>
         </div>
-      </footer>
-    </>
+      </div>
+    </footer>
   );
 }

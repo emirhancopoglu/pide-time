@@ -1,41 +1,29 @@
-"use client";
 import Image from "next/image";
-import ThemeChanger from "./theme-changer";
+import Link from "next/link";
+import { MapPin } from "lucide-react";
 import HeaderLogo from "@/assets/ramazanpidesi.png";
-import { useRouter } from "next/navigation";
-import { useApiContext } from "@/context/api-context";
+import ThemeChanger from "./theme-changer";
 
 export default function Header() {
-  const { setSelectedCity, setSelectedRegion } = useApiContext();
-  const router = useRouter();
-
-  const handleClearLocalStorage = () => {
-    localStorage.removeItem("selectedRegion");
-    localStorage.removeItem("selectedCity");
-    localStorage.removeItem("times");
-    setSelectedCity(null);
-    setSelectedRegion(null);
-
-    router.push("/ara");
-  };
-
   return (
-    <>
-      <header className="flex flex-row items-center justify-between py-2 border-b border-gray-300  dark:border-gray-600">
-        <div className="w-20 h-auto">
-          <a onClick={handleClearLocalStorage}>
-            <Image
-              src={HeaderLogo}
-              alt="Pide Vakti"
-              className="w-full h-full object-contain cursor-pointer"
-            />{" "}
-          </a>
-        </div>
-        <p className="text-orange-200 font-inter text-4xl font-semibold stroke-custom font-orbitron max-md:text-3xl">
-          Pide Vakti
-        </p>
-        <ThemeChanger />
-      </header>
-    </>
+    <header>
+      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
+        <Link href="/ara" className="flex items-center gap-2.5 rounded-md" aria-label="Pide Vakti ana sayfa">
+          <Image src={HeaderLogo} alt="" priority className="h-8 w-auto" />
+          <span className="font-display text-xl font-semibold tracking-tight">Pide Vakti</span>
+        </Link>
+
+        <nav className="flex items-center gap-1">
+          <Link
+            href="/ara"
+            className="inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-[0.95rem] text-muted-foreground transition-colors hover:bg-card hover:text-foreground"
+          >
+            <MapPin className="size-4" />
+            <span className="hidden sm:inline">Konum değiştir</span>
+          </Link>
+          <ThemeChanger />
+        </nav>
+      </div>
+    </header>
   );
 }

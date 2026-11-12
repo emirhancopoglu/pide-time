@@ -3,9 +3,11 @@
 
 Ramazan ayı için yapılmış, şehir veya şehir, ilçe üzerinden sahur ve iftar vakitlerini API üzerinden dinamik olarak çekerek kullanıcıya sunar.
 
-NextJS ile geliştirilen bu projede, sabit tasarım prensipleriyle Shadcn UI kullandım. Kullanıcılar şehir veya şehir, ilçe seçerek iftar ve sahur zamanlarını görebilme imkanı sağlanıyor. API olarak vakit.vercel.app tarafına istek atılıyor ve dinamik olarak zamanlar çekiliyor. Light ve Dark theme desteği bulunmaktadır.
+NextJS ile geliştirilen bu projede, sabit tasarım prensipleriyle Shadcn UI kullandım. Kullanıcılar şehir veya şehir, ilçe seçerek iftar ve sahur zamanlarını görebilme imkanı sağlanıyor. Vakitler Diyanet İşleri Başkanlığı verilerinden, uygulamanın kendi API route'ları üzerinden (sunucu tarafı önbellekli) çekiliyor. Konumdan otomatik il/ilçe bulma, canlı iftar/sahur geri sayımı ve 30 günlük imsakiye bulunuyor. Light ve Dark theme desteği bulunmaktadır.
 
-**Not: Verileri, saatleri API'dan aldığım için saatlerde 1-2 dakikalık oynamalar olabilir. Component'leri ShadCN UI'dan kullandığım için mobil görünümlerde responsive ve CSS hataları olabilir. ShadCN UI, CSS bug'ı fixlediğinde düzelecektir.**
+**Tasarım:** Geri sayım büyük, okunur bir cümle olarak gösterilir ("İftara 2 saat 14 dakika var."). Yanındaki **gün yayı** imsaktan iftara (gece fazında iftardan imsaka) uzanır; güneş ya da ay şu anki konumda durur, ara vakitler yay üzerinde işaretlidir (`src/components/sky-arc`). Renkler: kâğıt `#F4F5F7`, çivit mürekkep `#191B33`, alacakaranlık `#3F3DBC` (vurgu), gün batımı `#F2683A` (güneş ve iftar), gece `#1D2050`. Yazı tipleri Funnel Display ve Funnel Sans.
+
+**Ek özellikler:** iftar ve sahurdan 15 dakika önce tarayıcı bildirimi (sekme açıkken), paylaş butonu, Ramazan sayacı (Ramazan'ın kaçıncı günü ya da Ramazan'a kalan gün), iftardan sonraki 45 dakika "Hayırlı iftarlar" mesajı, ana sayfada İstanbul'un canlı önizlemesi ve büyükşehir kısayolları, son bakılan konumun hatırlanması.
 
 
 ## Demo
@@ -21,38 +23,17 @@ NextJS ile geliştirilen bu projede, sabit tasarım prensipleriyle Shadcn UI kul
 
 ## API Kullanımı
 
-Kullanılan API = https://vakit.vercel.app/
+Eski `vakit.vercel.app` API'si kapandığı için Diyanet verilerini sunan **https://ezanvakti.emushaf.net** kullanılıyor. İstekler uygulamanın kendi route handler'ları üzerinden yapılır ve Next.js data cache ile önbelleklenir (`src/lib/diyanet.js`).
 
-* selectedCity = Istanbul
-* selectedRegion = Sultanbeyli
-* cityOrRegionId =  311922 || 311914
-* ${currentYYMMDD} = Güncel yy-mm-dd
+| Uygulama | Kaynak | Önbellek |
+| --- | --- | --- |
+| `GET /api/iller` | `/sehirler/2` (Türkiye) | 30 gün |
+| `GET /api/ilceler/:ilId` | `/ilceler/:ilId` | 30 gün |
+| Sayfa `/:il/:ilce` (sunucu tarafı) | `/vakitler/:ilceId` (~30 gün) | 6 saat |
 
-#### Tüm şehirleri getir
-```bash
-  GET https://vakit.vercel.app/api/regions?country=Turkey
-```
+**Sayfa adresleri:** `/istanbul/kartal`, `/ankara/ankara` (il merkezi). `/istanbul` il merkezine, eski `/istanbul-kartal` biçimindeki bağlantılar yeni adrese yönlendirilir.
 
-#### Şehir ID getir
-```bash
-  GET https://vakit.vercel.app/api/searchPlaces?q=${selectedCity}&lang=tr
-```
-
-#### Şehir ilçelerini getir
-```bash
-  GET https://vakit.vercel.app/api/cities?country=Turkey&region=${selectedCity}
-```
-
-#### İlçe ID getir
-```bash
-  GET https://vakit.vercel.app/api/searchPlaces?q=${selectedRegion}&lang=tr
-```
-
-#### Belirtilen ID'nin imsak vakitlerini getir
-```bash
-  GET 
-  https://vakit.vercel.app/api/timesForPlace?id=${cityOrRegionId}&date=${currentYYMMDD}&days=30&timezoneOffset=180&calculationMethod=Turkey&lang=tr
-```
+**Konumdan bulma:** Tarayıcı konumu → OpenStreetMap Nominatim (yedek: BigDataCloud) ile ters geokodlama → `province` = il, `town` = ilçe. Diyanet'in ayrı vakit yayımlamadığı ilçelerde (ör. Kadıköy) il merkezinin vakitleri kullanılır.
 
 ## Ekran Görüntüleri
 
