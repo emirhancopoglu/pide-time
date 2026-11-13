@@ -20,8 +20,11 @@ const arcTo = (t) => {
  * gece fazında iftardan imsaka uzanır ve üstünde ay ilerler. Kartın rengi fazı gösterir.
  *
  * marks: fazın içine düşen diğer vakitler [{ key, label, t }]
+ * header: kartın üstünde (yayın üstünde) gösterilecek içerik
+ * children: saatlerin altında, ayraçsız gösterilecek içerik
+ * fit: yay, genişliğe göre değil kartın kalan yüksekliğine göre boyutlanır (yan sütunla aynı boyda kalmak için)
  */
-export default function SkyArc({ night, progress, marks = [], start, end, footer, className }) {
+export default function SkyArc({ night, progress, marks = [], start, end, header, footer, children, fit = false, className }) {
   const t = Math.min(1, Math.max(0, progress ?? 0));
   const body = pointAt(t);
 
@@ -33,8 +36,13 @@ export default function SkyArc({ night, progress, marks = [], start, end, footer
         className,
       )}
     >
-      <div className="flex flex-1 items-center">
-        <svg viewBox="0 0 320 168" className="block h-auto w-full" aria-hidden>
+      {header}
+      <div className={cn("flex flex-1 items-center", fit && "relative min-h-44")}>
+        <svg
+          viewBox="0 0 320 168"
+          className={fit ? "absolute inset-0 size-full" : "block h-auto w-full"}
+          aria-hidden
+        >
           {/* Ufuk */}
           <line x1="8" x2="312" y1={HORIZON} y2={HORIZON} stroke="currentColor" strokeOpacity="0.18" strokeWidth="1" />
 
@@ -133,6 +141,7 @@ export default function SkyArc({ night, progress, marks = [], start, end, footer
           {footer}
         </p>
       )}
+      {children}
     </figure>
   );
 }

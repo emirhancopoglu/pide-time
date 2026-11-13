@@ -1,17 +1,14 @@
-import Link from "next/link";
 import AccordionComponent from "@/components/accordion/accordion";
 import CityIftars from "@/components/city-iftars/city-iftars";
-import LivePreview from "@/components/live-preview/live-preview";
-import LocationPicker from "@/components/location-picker/location-picker";
+import HomeHero from "@/components/home-hero/home-hero";
 import { getCityIftars } from "@/lib/cities";
-import { getIlceler, getIller, getVakitler } from "@/lib/diyanet";
-import { findCenterDistrict } from "@/lib/turkish";
+import { loadPlaceTimes } from "@/lib/places";
 
 export const metadata = {
   title: "Konum seç",
 };
 
-// Önizleme verisi 6 saatte bir yenilenir; geri sayım tarayıcıda hesaplanır.
+// Varsayılan konumun verisi 6 saatte bir yenilenir; geri sayım tarayıcıda hesaplanır.
 export const revalidate = 21600;
 
 const CITIES = [
@@ -27,61 +24,21 @@ const CITIES = [
   ["Diyarbakır", "diyarbakir"],
 ];
 
-async function loadPreview() {
+/** Daha önce konum seçmemiş ziyaretçiye İstanbul gösterilir. */
+async function loadDefaultPlace() {
   try {
-    const iller = await getIller();
-    const il = iller.find((item) => item.slug === "istanbul");
-    if (!il) return null;
-    const center = findCenterDistrict(il, await getIlceler(il.id));
-    if (!center) return null;
-    const days = await getVakitler(center.id);
-    return days.length ? { days, href: `/${il.slug}/${center.slug}` } : null;
+    return await loadPlaceTimes("istanbul");
   } catch {
     return null;
   }
 }
 
 export default async function Page() {
-  const [preview, cities] = await Promise.all([loadPreview(), getCityIftars()]);
+  const [initial, cities] = await Promise.all([loadDefaultPlace(), getCityIftars()]);
 
   return (
     <>
-      <section className="grid gap-10 pt-10 sm:pt-16 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-14">
-        <div className="min-w-0">
-          <h1 className="font-display text-[clamp(2.75rem,7vw,5.5rem)] leading-[0.98] font-semibold tracking-[-0.035em] text-balance">
-            İftara ne kadar kaldı?
-          </h1>
-          <p className="mt-5 max-w-xl text-xl text-pretty text-muted-foreground">
-            Türkiye&apos;nin 81 ilinde iftar ve sahur vakitleri, Diyanet verileriyle. Konumunu seç, geri sayım
-            başlasın.
-          </p>
-          <div className="mt-8 max-w-xl">
-            <LocationPicker />
-          </div>
-        </div>
-
-        <div className="flex min-w-0 flex-col gap-8">
-          {preview && <LivePreview days={preview.days} inPlace="İstanbul'da" href={preview.href} />}
-
-          <nav aria-labelledby="sehirler-title">
-            <h2 id="sehirler-title" className="font-display text-xl font-semibold">
-              Büyükşehirler
-            </h2>
-            <ul className="mt-3 flex flex-wrap gap-2">
-              {CITIES.map(([name, slug]) => (
-                <li key={slug}>
-                  <Link
-                    href={`/${slug}`}
-                    className="inline-flex h-10 items-center rounded-full border border-border px-4 text-[0.95rem] transition-colors hover:border-primary hover:text-accent-foreground"
-                  >
-                    {name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
-      </section>
+      <HomeHero initial={initial} cities={CITIES} />
 
       {cities.length > 1 && <CityIftars cities={cities} className="mt-16 lg:mt-24" />}
 

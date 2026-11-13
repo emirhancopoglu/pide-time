@@ -37,3 +37,14 @@ export function findCenterDistrict(il, ilceler) {
 export function districtLabel(il, ilce) {
   return ilce.slug === il.slug ? "Merkez" : ilce.name;
 }
+
+// Sayının okunuşunun son kelimesine göre bulunma eki: "bir"→de, "üç"→te, "altı"→da, "kırk"→ta …
+const UNIT_SUFFIX = ["da", "de", "de", "te", "te", "te", "da", "de", "de", "da"];
+const TENS_SUFFIX = ["da", "da", "de", "da", "ta", "de"];
+const numberLocative = (n) => (n % 10 ? UNIT_SUFFIX[n % 10] : TENS_SUFFIX[n / 10]);
+
+/** "06:15" -> "te" (06:15'te), "19:18" -> "de", "17:00" -> "de" */
+export function timeLocative(hhmm) {
+  const [hours, minutes] = hhmm.split(":").map(Number);
+  return numberLocative(minutes || hours);
+}
