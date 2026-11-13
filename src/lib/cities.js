@@ -3,7 +3,6 @@ import { getIlceler, getIller, getVakitler } from "@/lib/diyanet";
 import { findCenterDistrict } from "@/lib/turkish";
 import { placeUrl } from "@/lib/place-url";
 
-/** Batıdan doğuya, karşılaştırma için seçilmiş iller. */
 export const COMPARE_CITIES = [
   "edirne",
   "izmir",
@@ -19,10 +18,6 @@ export const COMPARE_CITIES = [
   "van",
 ];
 
-/**
- * İl merkezlerinin iftar vakitleri. Sayfaya yalnızca gereken alanlar gönderilir.
- * Bir il alınamazsa listeden düşer; hepsi başarısızsa boş dizi döner.
- */
 export async function getCityIftars(slugs = COMPARE_CITIES) {
   let iller;
   try {

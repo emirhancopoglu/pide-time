@@ -1,8 +1,6 @@
 import "server-only";
 import { slugify, sortByName, toTitleCase } from "@/lib/turkish";
 
-// Diyanet İşleri Başkanlığı verilerini sunan açık API.
-// (Eski vakit.vercel.app API'si kapandığı için buraya geçildi.)
 const BASE_URL = "https://ezanvakti.emushaf.net";
 const TURKIYE_ID = 2;
 
@@ -55,7 +53,6 @@ export async function getIlceler(ilId) {
   return sortByName(data.map((item) => toPlace(item.IlceID, item.IlceAdi)));
 }
 
-/** "08.11.2026" -> "2026-11-08" */
 const toIsoDate = (value) => {
   const [day, month, year] = value.split(".");
   return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
@@ -69,7 +66,6 @@ const toUtcOffset = (hours = 3) => {
   return `${sign}${h}:${m}`;
 };
 
-/** Yaklaşık 30 günlük namaz vakitleri. */
 export async function getVakitler(ilceId) {
   if (!/^\d+$/.test(String(ilceId))) return [];
   const data = await request(`/vakitler/${ilceId}`, DAY / 4);
@@ -93,7 +89,6 @@ export async function getVakitler(ilceId) {
     .sort((a, b) => a.date.localeCompare(b.date));
 }
 
-/** URL slug'larını il / ilçe kayıtlarına çevirir. */
 export async function resolvePlace(ilSlug, ilceSlug) {
   const iller = await getIller();
   const il = iller.find((item) => item.slug === ilSlug);

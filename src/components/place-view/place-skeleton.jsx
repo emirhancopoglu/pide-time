@@ -1,14 +1,9 @@
 import { cn } from "@/lib/utils";
 
-/**
- * Veri ya da saat gelene kadar gösterilen iskeletler. Ölçüler gerçek bileşenlerle aynı tutulur
- * ki içerik geldiğinde sayfa kaymasın.
- */
 export function Bone({ className }) {
   return <span aria-hidden className={cn("block animate-pulse rounded-lg bg-secondary", className)} />;
 }
 
-/** "11 sa 34 dk 25 sn" yerine */
 export function CountdownSkeleton() {
   return (
     <div aria-hidden className="mt-5 flex flex-wrap items-end gap-x-4 sm:gap-x-6">
@@ -22,7 +17,6 @@ export function CountdownSkeleton() {
   );
 }
 
-/** Gökyüzü kartı yerine (yan sütunun boyuna uyar) */
 export function SkyCardSkeleton({ className }) {
   return (
     <div aria-hidden className={cn("flex min-h-[32rem] flex-col rounded-3xl bg-card p-5 sm:p-6", className)}>
@@ -59,7 +53,6 @@ function CardSkeleton({ className, children }) {
   return <div className={cn("flex flex-col rounded-3xl bg-card p-5 sm:p-7", className)}>{children}</div>;
 }
 
-/** Bugünün vakitleri, oruç süresi, şehir karşılaştırması ve imsakiye yerine */
 export function SectionsSkeleton() {
   return (
     <div aria-hidden className="flex flex-col gap-10">
@@ -113,7 +106,6 @@ export function SectionsSkeleton() {
   );
 }
 
-/** Sayfa sunucudan gelene kadar (loading.jsx) tüm konum içeriğinin iskeleti */
 export default function PlaceSkeleton() {
   return (
     <div className="flex flex-col gap-10" aria-busy="true" aria-label="Vakitler yükleniyor">

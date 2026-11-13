@@ -5,7 +5,6 @@ import { RAMAZAN_MONTH, daysBetween, findNextRamazan, formatLongDate, todayKey }
 
 const RAMAZAN_DAYS = 30;
 
-/** Ramazan'daysa kaçıncı gün olduğunu, değilse Ramazan'a kalan günü gösterir. */
 export default function RamazanMeter({ days }) {
   const now = useNow(60_000);
   if (!now) return <div className="h-[7.5rem]" aria-hidden />;

@@ -3,15 +3,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/*
- * Renk sistemi — gökyüzünün gün içindeki hâlleri
- *   Kâğıt          #F4F5F7  açık temada zemin
- *   Çivit mürekkep #191B33  metin
- *   Alacakaranlık  #3F3DBC  tek arayüz vurgusu (buton, odak, etkin vakit)
- *   Gün batımı     #F2683A  yalnızca güneş ve iftar vakti
- *   Gece           #1D2050  gece fazındaki gökyüzü kartı
- * Gündüz/gece kartlarının rengi bilgi taşır: kart, şu an hangi fazda olunduğunu gösterir.
- */
 :root {
   --ink: #191b33;
   --dusk: #3f3dbc;

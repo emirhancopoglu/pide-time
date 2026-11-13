@@ -16,7 +16,6 @@ const dateKeyFormatter = new Intl.DateTimeFormat("en-CA", {
   day: "2-digit",
 });
 
-/** Türkiye saatine göre bugünün YYYY-MM-DD karşılığı (kullanıcı nerede olursa olsun). */
 export const todayKey = (now = new Date()) => dateKeyFormatter.format(now);
 
 export const toInstant = (day, key) =>
@@ -56,7 +55,6 @@ export function formatDuration(ms) {
   return `${hours}:${minutes}:${seconds}`;
 }
 
-/** Başlık cümlesi için: "2 saat 14 dakika", "14 dakika", "37 saniye". */
 export function formatSpoken(ms) {
   const total = Math.max(0, Math.floor(ms / 1000));
   const h = Math.floor(total / 3600);
@@ -66,7 +64,6 @@ export function formatSpoken(ms) {
   return `${total % 60} saniye`;
 }
 
-/** Fazın (oruç ya da gece) içine düşen vakitler, fazdaki konumlarıyla (0–1). */
 export function getPhaseMarks(days, phase) {
   const span = phase.target - phase.start;
   const marks = [];
@@ -87,10 +84,6 @@ const hijriFormatter = new Intl.DateTimeFormat("tr-TR-u-ca-islamic-umalqura", {
   timeZone: "UTC",
 });
 
-/**
- * Bir sonraki 1 Ramazan. Diyanet verisinde varsa kesin tarih, yoksa Ümmü'l-Kurâ takviminden tahmin.
- * Dönen tarih YYYY-MM-DD.
- */
 export function findNextRamazan(days, fromKey) {
   const known = days.find((day) => day.date >= fromKey && day.hijriMonth === RAMAZAN_MONTH && parseInt(day.hijri, 10) === 1);
   if (known) return { date: known.date, exact: true };
@@ -109,7 +102,6 @@ export function findNextRamazan(days, fromKey) {
 export const daysBetween = (fromKey, toKey) =>
   Math.round((new Date(`${toKey}T00:00:00Z`) - new Date(`${fromKey}T00:00:00Z`)) / 86_400_000);
 
-/** "1 sa 12 dk" gibi kısa metin. */
 export function formatRelative(ms) {
   const totalMinutes = Math.max(0, Math.ceil(ms / 60000));
   const h = Math.floor(totalMinutes / 60);
@@ -118,10 +110,6 @@ export function formatRelative(ms) {
   return m === 0 ? `${h} sa` : `${h} sa ${m} dk`;
 }
 
-/**
- * Şu anki duruma göre iftar / sahur geri sayımını ve sıradaki vakti hesaplar.
- * Gün dönümünde bir sonraki günün imsak vakti kullanılır (eski kodda bugünün imsakı +1 gün alınıyordu).
- */
 export function getStatus(days, now) {
   const index = days.findIndex((day) => day.date === todayKey(now));
   if (index === -1) return null;
@@ -152,7 +140,6 @@ export function getStatus(days, now) {
   const iftarTarget = now < aksam ? aksam : nextAksam;
   const sahurTarget = now < imsak ? imsak : nextImsak;
 
-  // Sıradaki ve şu anki vakit
   const todayInstants = PRAYERS.map((prayer) => ({ ...prayer, at: toInstant(today, prayer.key) }));
   let next = todayInstants.find((prayer) => prayer.at > now);
   if (!next) {

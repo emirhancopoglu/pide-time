@@ -14,7 +14,6 @@ export async function GET(_request, { params }) {
       headers: { "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800" },
     });
   } catch (error) {
-    console.error(error);
     return NextResponse.json(
       { error: "İlçe listesi şu an alınamıyor." },
       { status: error.status ?? 500 }

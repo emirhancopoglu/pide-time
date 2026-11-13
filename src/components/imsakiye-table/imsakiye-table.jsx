@@ -4,9 +4,7 @@ import { useNow } from "@/lib/use-now";
 import { PRAYERS, RAMAZAN_MONTH, formatShortDate, todayKey } from "@/lib/prayer-times";
 
 export default function ImsakiyeTable({ days }) {
-  // Dakikada bir yeterli; gün dönünce bugün satırı kendiliğinden kayar.
   const now = useNow(60_000);
-  // İlk render'da (saat henüz yokken) da bugünden başla ki geçmiş günler bir an görünüp kaybolmasın
   const today = now ? todayKey(now) : todayKey();
   const rows = days.filter((day) => day.date >= today);
   const hasRamazan = rows.some((day) => day.hijriMonth === RAMAZAN_MONTH);

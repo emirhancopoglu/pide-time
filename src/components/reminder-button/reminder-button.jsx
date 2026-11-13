@@ -20,14 +20,9 @@ function writeEnabled(value) {
     if (value) localStorage.setItem(KEY, "1");
     else localStorage.removeItem(KEY);
   } catch {
-    /* gizli sekme vb. */
   }
 }
 
-/**
- * Sekme açıkken iftardan ve sahurdan 15 dakika önce tarayıcı bildirimi gönderir.
- * iftarAt / sahurAt: Date (bir sonraki iftar ve imsak)
- */
 export default function ReminderButton({ iftarAt, sahurAt, placeName }) {
   const [enabled, setEnabled] = useState(false);
 
@@ -36,7 +31,6 @@ export default function ReminderButton({ iftarAt, sahurAt, placeName }) {
     setEnabled(supported && Notification.permission === "granted" && readEnabled());
   }, []);
 
-  // Dakikaya yuvarla: her saniye yeniden zamanlamaya gerek yok
   const iftarKey = iftarAt ? Math.floor(iftarAt.getTime() / 60000) : null;
   const sahurKey = sahurAt ? Math.floor(sahurAt.getTime() / 60000) : null;
 

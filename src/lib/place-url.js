@@ -1,4 +1,3 @@
-/** Bir yerin /ara adresi: /ara?il=istanbul&ilce=kartal (il merkeziyse ilçe yazılmaz). */
 export function placeUrl(ilSlug, ilceSlug) {
   const params = new URLSearchParams({ il: ilSlug });
   if (ilceSlug && ilceSlug !== ilSlug) params.set("ilce", ilceSlug);

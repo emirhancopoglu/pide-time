@@ -10,7 +10,6 @@ export default function ThemeChanger() {
 
   useEffect(() => setMounted(true), []);
 
-  // Sunucuda tema bilinmez; mount olmadan temaya bağlı attribute üretme (hydration uyuşmazlığı).
   const isDark = mounted && resolvedTheme === "dark";
 
   return (

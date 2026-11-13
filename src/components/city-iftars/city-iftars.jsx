@@ -11,11 +11,6 @@ const toMinutes = (hhmm) => {
 const toHHMM = (minutes) =>
   `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
 
-/**
- * Bugün iftarın şehirden şehire nasıl kaydığını gösteren nokta grafiği.
- * cities: [{ name, slug, href, days: [{ date, aksam }] }]
- * current: { name, days } — varsa listede vurgulanır ve farklar ona göre yazılır
- */
 export default function CityIftars({ cities, current, className }) {
   const now = useNow(60_000);
   const key = now ? todayKey(now) : todayKey();
@@ -58,7 +53,6 @@ export default function CityIftars({ cities, current, className }) {
         fark var.
       </p>
 
-      {/* Zaman ekseni */}
       <div className="mt-6 grid grid-cols-[6.5rem_minmax(0,1fr)_4.5rem] gap-x-3 sm:grid-cols-[8rem_minmax(0,1fr)_5.5rem]">
         <span />
         <div className="figures relative h-5 text-xs text-muted-foreground" aria-hidden>

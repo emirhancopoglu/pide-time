@@ -38,13 +38,11 @@ const dateFormatter = new Intl.DateTimeFormat("tr-TR", {
   year: "numeric",
   weekday: "long",
 });
-/** "13 Kasım 2026, Cuma" */
 function formatToday(now) {
   const parts = Object.fromEntries(dateFormatter.formatToParts(now).map((part) => [part.type, part.value]));
   return `${parts.day} ${parts.month} ${parts.year}, ${parts.weekday}`;
 }
 
-/** Şu andan sonraki vakitler (bugün ve yarın). */
 function upcomingTimes(days, now, count) {
   const index = days.findIndex((day) => day.date === todayKey(now));
   if (index === -1) return [];
@@ -58,7 +56,6 @@ function upcomingTimes(days, now, count) {
   return list.slice(0, count);
 }
 
-/** "06:15'te" — saat kalın, ek düz */
 function At({ time }) {
   return (
     <>
@@ -78,15 +75,6 @@ function Unit({ value, unit, accent }) {
 
 const UPCOMING_COUNT = 3;
 
-
-/**
- * /ara sayfasının konuma bağlı tüm içeriği: geri sayım, bugünün vakitleri, oruç süresi,
- * şehir karşılaştırması ve imsakiye. Konum URL'de tutulur (/ara?il=…&ilce=…); konum
- * değiştirmek bu adrese gitmek demektir, veri sunucuda yüklenir.
- *
- * data: { place, days } | null   fromUrl: konum adreste yazıyor muydu
- * quickCities: hızlı geçiş için [[ad, slug]]   compareCities: getCityIftars() sonucu
- */
 export default function PlaceView({ data, fromUrl, quickCities, compareCities }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -99,27 +87,28 @@ export default function PlaceView({ data, fromUrl, quickCities, compareCities })
     startTransition(() => router.push(placeUrl(ilSlug, ilceSlug), { scroll: false }));
   };
 
-  // Adreste konum yoksa son bakılan yerle aç; varsa onu son bakılan yer olarak hatırla
   const ilSlug = place?.il.slug;
+  const ilName = place?.il.name;
   const ilceSlug = place?.ilce.slug;
+  const ilceName = place?.ilce.name;
   useEffect(() => {
     if (fromUrl) {
-      if (ilSlug) saveLastLocation({ il: place.il, ilce: place.ilce });
+      if (ilSlug) {
+        saveLastLocation({ il: { name: ilName, slug: ilSlug }, ilce: { name: ilceName, slug: ilceSlug } });
+      }
       return;
     }
     const last = readLastLocation();
     if (last && (last.il.slug !== ilSlug || last.ilce.slug !== ilceSlug)) {
       startTransition(() => router.replace(placeUrl(last.il.slug, last.ilce.slug), { scroll: false }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fromUrl, ilSlug, ilceSlug]);
+  }, [fromUrl, ilSlug, ilName, ilceSlug, ilceName, router]);
 
   const status = now && days.length ? getStatus(days, now) : null;
   const missingToday = Boolean(now && days.length && !status);
   const isIftar = status ? status.phase.type === "iftar" : true;
   const today = status?.today ?? days.find((day) => day.date === todayKey()) ?? days[0];
 
-  // Sekme başlığında geri sayım
   useEffect(() => {
     if (!status || !place) return;
     const previous = document.title;
@@ -129,13 +118,11 @@ export default function PlaceView({ data, fromUrl, quickCities, compareCities })
     };
   });
 
-  // Saat henüz bilinmiyorsa (ilk açılış) ya da yeni konum yükleniyorsa zamana bağlı parçalar iskelet olur
   const loading = !now || pending;
   const remaining = status ? splitDuration(status.phase.remaining) : null;
   const upcoming = status ? upcomingTimes(days, now, UPCOMING_COUNT) : [];
   const muted = isIftar ? "text-day-sky-muted" : "text-night-sky-muted";
 
-  // Karşılaştırmada bu ilçe kendi adıyla vurgulanır; il merkeziyse listedeki ilin satırı vurgulanır
   const current = place && {
     name: place.isCenter ? place.il.name : place.ilce.name,
     slug: place.isCenter ? place.il.slug : `${place.il.slug}-${place.ilce.slug}`,
@@ -289,7 +276,6 @@ export default function PlaceView({ data, fromUrl, quickCities, compareCities })
         )}
       </section>
 
-      {/* Şehir değişirken yeni veri gelene kadar iskelet; ilk açılışta sunucudan gelen içerik hemen görünür */}
       {pending && <SectionsSkeleton />}
       {today && !pending && (
         <div className="flex flex-col gap-10">

@@ -6,7 +6,6 @@ export function saveLastLocation(location) {
   try {
     localStorage.setItem(KEY, JSON.stringify(location));
   } catch {
-    /* gizli sekme vb. */
   }
 }
 

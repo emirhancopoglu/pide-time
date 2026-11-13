@@ -21,7 +21,6 @@ const DEFAULT_IL = "istanbul";
 
 const param = (value) => (Array.isArray(value) ? value[0] : value) || null;
 
-/** Adresteki konum (/ara?il=…&ilce=…); yoksa varsayılan il. Servis yanıt vermezse data null, failed true. */
 async function loadPage(searchParams) {
   const query = await searchParams;
   const il = param(query.il);
@@ -30,7 +29,6 @@ async function loadPage(searchParams) {
     const data = await loadPlaceTimes(il ?? DEFAULT_IL, ilce);
     return { data, fromUrl: Boolean(il), failed: false };
   } catch {
-    // Vakit servisi yanıt vermedi: konum hatalı değil, sayfa hata mesajıyla açılır
     return { data: null, fromUrl: Boolean(il), failed: true };
   }
 }

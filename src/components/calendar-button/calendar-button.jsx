@@ -4,7 +4,6 @@ import { CalendarPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toInstant, todayKey } from "@/lib/prayer-times";
 
-// iCalendar metin alanlarında virgül, noktalı virgül ve ters bölü kaçırılmalı
 const escapeText = (value) => value.replace(/\\/g, "\\\\").replace(/([,;])/g, "\\$1");
 const stamp = (date) => date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 

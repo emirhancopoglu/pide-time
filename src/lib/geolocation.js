@@ -26,7 +26,6 @@ function getPosition() {
       };
       reject(new LocationError(messages[error.code] ?? "Konum alınamadı."));
     }, {
-      // Şehir/ilçe düzeyi yeterli; yüksek hassasiyet mobilde gereksiz gecikme yaratıyor.
       enableHighAccuracy: false,
       timeout: 15_000,
       maximumAge: 10 * 60 * 1000,
@@ -34,7 +33,6 @@ function getPosition() {
   });
 }
 
-/** OpenStreetMap Nominatim: Türkiye'de il = `province`, ilçe = `town` / `county`. */
 async function reverseWithNominatim(lat, lon) {
   const url = new URL("https://nominatim.openstreetmap.org/reverse");
   url.search = new URLSearchParams({
@@ -55,7 +53,6 @@ async function reverseWithNominatim(lat, lon) {
   };
 }
 
-/** Yedek servis: BigDataCloud (anahtarsız, istemci tarafı). */
 async function reverseWithBigDataCloud(lat, lon) {
   const url = new URL("https://api.bigdatacloud.net/data/reverse-geocode-client");
   url.search = new URLSearchParams({ latitude: lat, longitude: lon, localityLanguage: "tr" });
@@ -71,7 +68,6 @@ async function reverseWithBigDataCloud(lat, lon) {
   };
 }
 
-/** Kullanıcının konumundan il ve ilçe adı adaylarını döndürür. */
 export async function detectLocation() {
   const position = await getPosition();
   const { latitude, longitude } = position.coords;

@@ -2,10 +2,6 @@ import "server-only";
 import { getIlceler, getIller, getVakitler } from "@/lib/diyanet";
 import { districtLabel, findCenterDistrict, slugify } from "@/lib/turkish";
 
-/**
- * İl slug'ını il kaydına çevirir. Eski sürümdeki "istanbul-kartal" biçimini de tanır;
- * o durumda ilçe slug'ı da döner.
- */
 function findIl(iller, slug) {
   const exact = iller.find((item) => item.slug === slug);
   if (exact) return { il: exact, legacyIlce: null };
@@ -16,10 +12,6 @@ function findIl(iller, slug) {
   return legacy ? { il: legacy, legacyIlce: slug.slice(legacy.slug.length + 1) } : null;
 }
 
-/**
- * Bir yerin adı ve vakitleri. İlçe verilmezse ya da bulunamazsa il merkezi kullanılır.
- * İl bulunamazsa ya da vakit yoksa null döner.
- */
 export async function loadPlaceTimes(ilSlug, ilceSlug) {
   const found = findIl(await getIller(), slugify(ilSlug ?? ""));
   if (!found) return null;

@@ -1,10 +1,6 @@
 import { cn } from "@/lib/utils";
 import { PRAYERS, formatRelative } from "@/lib/prayer-times";
 
-/**
- * Bugünün altı vakti; şu anki vakit vurgulanır, sıradakinin altında kalan süre yazar.
- * today: { times }   status: getStatus() sonucu ya da null (ilk render)
- */
 export default function TodayTimes({ today, status }) {
   return (
     <section aria-labelledby="bugun-title">

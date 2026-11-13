@@ -5,7 +5,6 @@ import Footer from "@/components/footer/footer";
 import { Toaster } from "@/components/ui/sonner";
 import "@/styles/globals.css";
 
-// latin-ext: ğ, ş, ı, İ gibi Türkçe karakterler için gerekli
 const heading = Funnel_Display({
   variable: "--font-heading",
   subsets: ["latin", "latin-ext"],

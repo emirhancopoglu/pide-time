@@ -10,7 +10,6 @@ export default function ShareButton({ title }) {
       try {
         await navigator.share({ title, url });
       } catch {
-        /* kullanıcı paylaşımı kapattı */
       }
       return;
     }

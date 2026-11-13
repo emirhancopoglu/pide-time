@@ -10,7 +10,6 @@ const formatMinutes = (total) => {
   return m === 0 ? `${h} sa` : `${h} sa ${m} dk`;
 };
 
-/** Önümüzdeki günlerde oruç süresi (imsak → iftar). Tek seri: çizgi + %10 alan. */
 export default function FastingChart({ days, className }) {
   const now = useNow(60_000);
   const plotRef = useRef(null);
@@ -55,7 +54,6 @@ export default function FastingChart({ days, className }) {
       ? `${n} gün boyunca aynı kalıyor.`
       : `${n} gün içinde ${Math.abs(change)} dakika ${change < 0 ? "kısalıyor" : "uzuyor"}.`;
 
-  // Ramazan günlerini arka planda bant olarak göster
   const ramazanStart = points.findIndex((p) => p.ramazan);
   const ramazanEnd = points.findLastIndex((p) => p.ramazan);
 
@@ -88,7 +86,6 @@ export default function FastingChart({ days, className }) {
 
       <div className="mt-7 flex flex-1 flex-col">
         <div className="relative min-h-56 flex-1 sm:min-h-64">
-          {/* Izgara ve etiketler */}
           {ticks.map((t) => (
             <div
               key={t}
@@ -123,7 +120,6 @@ export default function FastingChart({ days, className }) {
             />
           </svg>
 
-          {/* Bugün ve son gün noktaları */}
           {[0, n - 1].map((i) => (
             <span
               key={i}
@@ -133,7 +129,6 @@ export default function FastingChart({ days, className }) {
             />
           ))}
 
-          {/* Etkileşim katmanı: imleç en yakın güne oturur */}
           <div
             ref={plotRef}
             role="slider"

@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 
-// Yay geometrisi (viewBox birimleri)
 const CX = 160;
 const HORIZON = 150;
 const R = 128;
@@ -15,15 +14,6 @@ const arcTo = (t) => {
   return `M ${CX - R} ${HORIZON} A ${R} ${R} 0 0 1 ${p.x.toFixed(2)} ${p.y.toFixed(2)}`;
 };
 
-/**
- * Fazın gökyüzü kartı. Oruç fazında yay imsaktan iftara uzanır ve üstünde güneş,
- * gece fazında iftardan imsaka uzanır ve üstünde ay ilerler. Kartın rengi fazı gösterir.
- *
- * marks: fazın içine düşen diğer vakitler [{ key, label, t }]
- * header: kartın üstünde (yayın üstünde) gösterilecek içerik
- * children: saatlerin altında, ayraçsız gösterilecek içerik
- * fit: yay, genişliğe göre değil kartın kalan yüksekliğine göre boyutlanır (yan sütunla aynı boyda kalmak için)
- */
 export default function SkyArc({ night, progress, marks = [], start, end, header, footer, children, fit = false, className }) {
   const t = Math.min(1, Math.max(0, progress ?? 0));
   const body = pointAt(t);
@@ -43,10 +33,8 @@ export default function SkyArc({ night, progress, marks = [], start, end, header
           className={fit ? "absolute inset-0 size-full" : "block h-auto w-full"}
           aria-hidden
         >
-          {/* Ufuk */}
           <line x1="8" x2="312" y1={HORIZON} y2={HORIZON} stroke="currentColor" strokeOpacity="0.18" strokeWidth="1" />
 
-          {/* Kalan yol */}
           <path
             d={arcTo(1)}
             fill="none"
@@ -56,7 +44,6 @@ export default function SkyArc({ night, progress, marks = [], start, end, header
             strokeDasharray="2 5"
             strokeLinecap="round"
           />
-          {/* Geçilen yol */}
           {progress != null && t > 0 && (
             <path
               d={arcTo(t)}
@@ -67,7 +54,6 @@ export default function SkyArc({ night, progress, marks = [], start, end, header
             />
           )}
 
-          {/* Ara vakitler */}
           {marks.map((mark) => {
             const p = pointAt(mark.t);
             const passed = mark.t <= t;
@@ -82,7 +68,6 @@ export default function SkyArc({ night, progress, marks = [], start, end, header
                   strokeOpacity={passed ? 0.9 : 0.4}
                   strokeWidth="1.5"
                 />
-                {/* Etiket yayın iç tarafına, merkeze doğru yazılır ki çizgiye binmesin */}
                 <text
                   x={mark.t < 0.4 ? p.x + 9 : mark.t > 0.6 ? p.x - 9 : p.x}
                   y={mark.t < 0.4 || mark.t > 0.6 ? p.y + 4 : p.y + 18}
@@ -97,7 +82,6 @@ export default function SkyArc({ night, progress, marks = [], start, end, header
             );
           })}
 
-          {/* Güneş ya da ay */}
           {progress != null &&
             (night ? (
               <g>

@@ -11,10 +11,8 @@ import { districtLabel, findCenterDistrict, slugify } from "@/lib/turkish";
 import { placeUrl } from "@/lib/place-url";
 import { Bone } from "@/components/place-view/place-skeleton";
 
-// İl ve ilçe kutuları (ya da iskeletleri) satırı eşit paylaşır; mobilde yan yana, altta düğmeler
 const SLOT = "min-w-0 flex-1 basis-[calc(50%-0.25rem)] sm:basis-0";
 
-/** Açılır liste yüklenirken onun yerinde duran iskelet */
 function SelectBone({ label }) {
   return (
     <span role="status" className={cn(SLOT, "h-11")}>
@@ -24,7 +22,6 @@ function SelectBone({ label }) {
   );
 }
 
-// Satırlar yer değiştirirken hafif bir belirme + kayma
 const SWAP_IN = "animate-in fade-in duration-200 ease-out motion-reduce:animate-none";
 
 async function fetchJson(url) {
@@ -36,15 +33,8 @@ async function fetchJson(url) {
   return data;
 }
 
-/**
- * Seçili konum, il/ilçe seçimi, cihaz konumu ve hızlı geçiş düğmeleri.
- * place: { il: { slug }, label } | null
- * cities: [[ad, slug]]
- * onSelect(ilSlug, ilceSlug?): konumu değiştirir (Promise; başarısızsa reddedilir)
- */
 export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
   const [open, setOpen] = useState(false);
-  // İlk yüklemede konum satırı animasyonsuz gelsin; yalnızca Değiştir/Vazgeç geçişlerinde canlansın
   const [touched, setTouched] = useState(false);
 
   const [iller, setIller] = useState([]);
@@ -58,7 +48,6 @@ export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
   const [ilceId, setIlceId] = useState("");
   const [locating, setLocating] = useState(false);
 
-  // Hızlı il değişimlerinde eski isteğin sonucunu yok saymak için
   const ilceRequestRef = useRef(0);
 
   const loadIller = useCallback(async () => {
@@ -80,7 +69,6 @@ export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
   const ilce = ilceler.find((item) => item.id === ilceId);
   const busy = locating || pending;
 
-  // Esc seçimden vazgeçer (açık bir liste varsa önce o kapanır)
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (event) => {
@@ -131,7 +119,6 @@ export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
       await onSelect(il.slug, ilce.slug);
       setOpen(false);
     } catch {
-      /* hata mesajını onSelect gösterir */
     }
   };
 
@@ -173,7 +160,6 @@ export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
 
   return (
     <section aria-label="Konum" className="rounded-3xl bg-card p-4 sm:p-5">
-      {/* Değiştir'e basınca bu satır il/ilçe seçimine dönüşür; iki hâl de aynı yükseklikte, kart boyu değişmez */}
       {open ? (
         <div className={cn("flex min-h-12 flex-wrap items-center gap-2 sm:flex-nowrap", SWAP_IN, "slide-in-from-bottom-1")}>
           {illerError ? (
@@ -308,7 +294,6 @@ export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
               href={placeUrl(slug)}
               aria-current={active ? "true" : undefined}
               onClick={(event) => {
-                // Sayfada kalıp geri sayımı değiştir; yeni sekmede açma gibi durumlarda bağlantı çalışsın
                 if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
                 event.preventDefault();
                 if (!active && !busy) onSelect(slug).catch(() => {});
