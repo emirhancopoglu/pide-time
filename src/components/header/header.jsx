@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { MapPin } from "lucide-react";
 import Logo from "@/components/logo/logo";
 import ThemeChanger from "./theme-changer";
 
@@ -12,16 +11,7 @@ export default function Header() {
           <span className="font-display text-xl font-semibold tracking-tight">Pide Vakti</span>
         </Link>
 
-        <nav className="flex items-center gap-1">
-          <Link
-            href="/ara"
-            className="inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-[0.95rem] text-muted-foreground transition-colors hover:bg-card hover:text-foreground"
-          >
-            <MapPin className="size-4" />
-            <span className="hidden sm:inline">Konum değiştir</span>
-          </Link>
-          <ThemeChanger />
-        </nav>
+        <ThemeChanger />
       </div>
     </header>
   );
