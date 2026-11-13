@@ -1,13 +1,16 @@
 "use client";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Loader2, LocateFixed, MapPin, RotateCw } from "lucide-react";
+import { Loader2, LocateFixed, MapPin, RotateCw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { detectLocation, LocationError } from "@/lib/geolocation";
 import { districtLabel, findCenterDistrict, slugify } from "@/lib/turkish";
+
+// Satırlar yer değiştirirken hafif bir belirme + kayma
+const SWAP_IN = "animate-in fade-in duration-200 ease-out motion-reduce:animate-none";
 
 async function fetchJson(url) {
   const response = await fetch(url);
@@ -26,6 +29,8 @@ async function fetchJson(url) {
  */
 export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
   const [open, setOpen] = useState(false);
+  // İlk yüklemede konum satırı animasyonsuz gelsin; yalnızca Değiştir/Vazgeç geçişlerinde canlansın
+  const [touched, setTouched] = useState(false);
 
   const [iller, setIller] = useState([]);
   const [illerError, setIllerError] = useState(null);
@@ -60,10 +65,20 @@ export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
   const ilce = ilceler.find((item) => item.id === ilceId);
   const busy = locating || pending;
 
-  const toggle = () => {
-    const next = !open;
-    setOpen(next);
-    if (next && !iller.length && !illerLoading) loadIller().catch(() => {});
+  // Esc seçimden vazgeçer (açık bir liste varsa önce o kapanır)
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event) => {
+      if (event.key === "Escape" && !document.querySelector('[data-slot="select-content"]')) setOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open]);
+
+  const openPicker = () => {
+    setTouched(true);
+    setOpen(true);
+    if (!iller.length && !illerLoading) loadIller().catch(() => {});
   };
 
   const handleIlChange = async (value) => {
@@ -143,62 +158,32 @@ export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
 
   return (
     <section aria-label="Konum" className="rounded-3xl bg-card p-4 sm:p-5">
-      <div className="flex items-center gap-3">
-        <span className="hidden size-11 shrink-0 place-items-center sm:grid rounded-xl bg-secondary text-muted-foreground">
-          <MapPin className="size-5" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm text-muted-foreground">Konumun</p>
-          {place ? (
-            <Link
-              href={place.href}
-              className="block truncate font-display text-lg font-semibold hover:underline hover:underline-offset-4"
-            >
-              {place.label}
-            </Link>
-          ) : (
-            <p className="font-display text-lg font-semibold">Seçilmedi</p>
-          )}
-        </div>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={toggle}
-          aria-expanded={open}
-          aria-controls="konum-sec"
-          className="h-11 rounded-xl px-4 text-[0.95rem] font-semibold shadow-none"
-        >
-          {open ? "Kapat" : "Değiştir"}
-        </Button>
-        <Button
-          type="button"
-          size="icon"
-          onClick={handleLocate}
-          disabled={busy}
-          aria-label="Konumumu bul"
-          title="Konumumu bul"
-          className="size-11 rounded-xl shadow-none"
-        >
-          {locating ? <Loader2 className="size-5 animate-spin" /> : <LocateFixed className="size-5" />}
-        </Button>
-      </div>
-
-      {open && (
-        <div id="konum-sec" className="mt-4 border-t border-border pt-4">
+      {/* Değiştir'e basınca bu satır il/ilçe seçimine dönüşür; iki hâl de aynı yükseklikte, kart boyu değişmez */}
+      {open ? (
+        <div className={cn("flex min-h-12 flex-wrap items-center gap-2 sm:flex-nowrap", SWAP_IN, "slide-in-from-bottom-1")}>
           {illerError ? (
-            <div className="flex flex-col items-start gap-3 rounded-2xl bg-destructive/10 p-4">
-              <p>
-                <span className="font-bold">İl listesi yüklenemedi.</span>{" "}
+            <>
+              <p className="min-w-0 flex-1 text-sm">
+                <span className="font-semibold">İl listesi yüklenemedi.</span>{" "}
                 <span className="text-muted-foreground">{illerError}</span>
               </p>
-              <Button variant="outline" size="sm" onClick={() => loadIller().catch(() => {})}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => loadIller().catch(() => {})}
+                className="h-11 rounded-xl px-4 shadow-none"
+              >
                 <RotateCw /> Tekrar dene
               </Button>
-            </div>
+            </>
           ) : (
-            <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
+            <form onSubmit={handleSubmit} className="contents">
               <Select value={ilId} onValueChange={handleIlChange} disabled={illerLoading || busy}>
-                <SelectTrigger className="h-11 w-full rounded-xl border-0 bg-secondary px-4 text-base shadow-none" aria-label="İl seç">
+                <SelectTrigger
+                  autoFocus
+                  className="h-11 min-w-0 flex-1 basis-[calc(50%-0.25rem)] rounded-xl border-0 bg-secondary px-4 text-base shadow-none sm:basis-0"
+                  aria-label="İl seç"
+                >
                   <SelectValue placeholder={illerLoading ? "Yükleniyor…" : "İl seç"} />
                 </SelectTrigger>
                 <SelectContent className="max-h-72">
@@ -211,7 +196,10 @@ export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
               </Select>
 
               <Select value={ilceId} onValueChange={setIlceId} disabled={!ilId || ilcelerLoading || busy}>
-                <SelectTrigger className="h-11 w-full rounded-xl border-0 bg-secondary px-4 text-base shadow-none" aria-label="İlçe seç">
+                <SelectTrigger
+                  className="h-11 min-w-0 flex-1 basis-[calc(50%-0.25rem)] rounded-xl border-0 bg-secondary px-4 text-base shadow-none sm:basis-0"
+                  aria-label="İlçe seç"
+                >
                   <SelectValue placeholder={ilcelerLoading ? "Yükleniyor…" : "İlçe seç"} />
                 </SelectTrigger>
                 <SelectContent className="max-h-72">
@@ -224,12 +212,65 @@ export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
                 </SelectContent>
               </Select>
 
-              <Button type="submit" disabled={!ilce || busy} className="h-11 rounded-xl px-5 text-[0.95rem] font-semibold shadow-none">
+              <Button
+                type="submit"
+                disabled={!ilce || busy}
+                className="h-11 flex-1 rounded-xl px-5 text-[0.95rem] font-semibold shadow-none sm:flex-none"
+              >
                 {pending && !locating && <Loader2 className="animate-spin" />}
                 Göster
               </Button>
             </form>
           )}
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => setOpen(false)}
+            aria-label="Vazgeç"
+            title="Vazgeç"
+            className="size-11 rounded-xl shadow-none"
+          >
+            <X className="size-5" />
+          </Button>
+        </div>
+      ) : (
+        <div className={cn("flex min-h-12 items-center gap-3", touched && [SWAP_IN, "slide-in-from-top-1"])}>
+          <span className="hidden size-11 shrink-0 place-items-center rounded-xl bg-secondary text-muted-foreground sm:grid">
+            <MapPin className="size-5" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm text-muted-foreground">Konumun</p>
+            {place ? (
+              <Link
+                href={place.href}
+                className="block truncate font-display text-lg font-semibold hover:underline hover:underline-offset-4"
+              >
+                {place.label}
+              </Link>
+            ) : (
+              <p className="font-display text-lg font-semibold">Seçilmedi</p>
+            )}
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={openPicker}
+            className="h-11 rounded-xl px-4 text-[0.95rem] font-semibold shadow-none"
+          >
+            Değiştir
+          </Button>
+          <Button
+            type="button"
+            size="icon"
+            onClick={handleLocate}
+            disabled={busy}
+            aria-label="Konumumu bul"
+            title="Konumumu bul"
+            className="size-11 rounded-xl shadow-none"
+          >
+            {locating ? <Loader2 className="size-5 animate-spin" /> : <LocateFixed className="size-5" />}
+          </Button>
         </div>
       )}
 
