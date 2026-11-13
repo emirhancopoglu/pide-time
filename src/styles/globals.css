@@ -5,7 +5,7 @@
 
 :root {
   --ink: #191b33;
-  --dusk: #3f3dbc;
+  --crust: #c26a1c;
   --sunset: #f2683a;
   --paper: #f4f5f7;
   --night: #1d2050;
@@ -19,21 +19,21 @@
   --card-foreground: var(--ink);
   --popover: #ffffff;
   --popover-foreground: var(--ink);
-  --primary: var(--dusk);
+  --primary: var(--crust);
   --primary-foreground: #ffffff;
   --secondary: color-mix(in oklab, var(--ink) 7%, var(--paper));
   --secondary-foreground: var(--ink);
   --muted: color-mix(in oklab, var(--ink) 5%, var(--paper));
   --muted-foreground: color-mix(in oklab, var(--ink) 62%, var(--paper));
-  --accent: color-mix(in oklab, var(--dusk) 9%, white);
-  --accent-foreground: var(--dusk);
+  --accent: color-mix(in oklab, var(--crust) 9%, white);
+  --accent-foreground: var(--crust);
   --destructive: #c0352b;
   --border: color-mix(in oklab, var(--ink) 11%, var(--paper));
   --input: color-mix(in oklab, var(--ink) 18%, var(--paper));
-  --ring: var(--dusk);
+  --ring: var(--crust);
 
   --sunset-ink: #c24a1c;
-  --now: color-mix(in oklab, var(--dusk) 8%, white);
+  --now: color-mix(in oklab, var(--crust) 8%, white);
   --day-sky: #e1e9f6;
   --day-sky-foreground: var(--ink);
   --day-sky-muted: color-mix(in oklab, var(--ink) 60%, #e1e9f6);
@@ -49,22 +49,22 @@
   --card-foreground: #ecedf6;
   --popover: #1b1e3a;
   --popover-foreground: #ecedf6;
-  --primary: #8f8df7;
+  --primary: #e8902e;
   --primary-foreground: #0e1022;
   --secondary: #21254a;
   --secondary-foreground: #ecedf6;
   --muted: #191c37;
   --muted-foreground: #9c9eb9;
-  --accent: color-mix(in oklab, #8f8df7 16%, #161932);
-  --accent-foreground: #cfceff;
+  --accent: color-mix(in oklab, #e8902e 16%, #161932);
+  --accent-foreground: #f6b95a;
   --destructive: #f07a70;
   --border: #252948;
   --input: #30345a;
-  --ring: #8f8df7;
+  --ring: #e8902e;
 
   --sunset: #ff8a5c;
   --sunset-ink: #ff8a5c;
-  --now: color-mix(in oklab, #8f8df7 14%, #161932);
+  --now: color-mix(in oklab, #e8902e 14%, #161932);
   --day-sky: #1b2650;
   --day-sky-foreground: #ecedf6;
   --day-sky-muted: color-mix(in oklab, #ecedf6 62%, #1b2650);
@@ -136,7 +136,7 @@
   }
 
   ::selection {
-    background: var(--dusk);
+    background: var(--crust);
     color: #ffffff;
   }
 }
