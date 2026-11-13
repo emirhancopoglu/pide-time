@@ -1,15 +1,8 @@
+import { notFound } from "next/navigation";
 import AccordionComponent from "@/components/accordion/accordion";
-import CityIftars from "@/components/city-iftars/city-iftars";
-import HomeHero from "@/components/home-hero/home-hero";
+import PlaceView from "@/components/place-view/place-view";
 import { getCityIftars } from "@/lib/cities";
 import { loadPlaceTimes } from "@/lib/places";
-
-export const metadata = {
-  title: "Konum seç",
-};
-
-// Varsayılan konumun verisi 6 saatte bir yenilenir; geri sayım tarayıcıda hesaplanır.
-export const revalidate = 21600;
 
 const CITIES = [
   ["İstanbul", "istanbul"],
@@ -24,23 +17,41 @@ const CITIES = [
   ["Diyarbakır", "diyarbakir"],
 ];
 
-/** Daha önce konum seçmemiş ziyaretçiye İstanbul gösterilir. */
-async function loadDefaultPlace() {
+const DEFAULT_IL = "istanbul";
+
+const param = (value) => (Array.isArray(value) ? value[0] : value) || null;
+
+/** Adresteki konum (/ara?il=…&ilce=…); yoksa varsayılan il. Servis yanıt vermezse data null, failed true. */
+async function loadPage(searchParams) {
+  const query = await searchParams;
+  const il = param(query.il);
+  const ilce = param(query.ilce);
   try {
-    return await loadPlaceTimes("istanbul");
+    const data = await loadPlaceTimes(il ?? DEFAULT_IL, ilce);
+    return { data, fromUrl: Boolean(il), failed: false };
   } catch {
-    return null;
+    // Vakit servisi yanıt vermedi: konum hatalı değil, sayfa hata mesajıyla açılır
+    return { data: null, fromUrl: Boolean(il), failed: true };
   }
 }
 
-export default async function Page() {
-  const [initial, cities] = await Promise.all([loadDefaultPlace(), getCityIftars()]);
+export async function generateMetadata({ searchParams }) {
+  const { data, fromUrl } = await loadPage(searchParams);
+  if (!fromUrl || !data) return { title: "İftar ve sahur vakitleri" };
+  const name = data.place.label;
+  return {
+    title: `${name} iftar ve sahur vakitleri`,
+    description: `${name} için Diyanet verileriyle iftar ve sahur geri sayımı, günlük namaz vakitleri ve imsakiye.`,
+  };
+}
+
+export default async function Page({ searchParams }) {
+  const [{ data, fromUrl, failed }, cities] = await Promise.all([loadPage(searchParams), getCityIftars()]);
+  if (fromUrl && !data && !failed) notFound();
 
   return (
     <>
-      <HomeHero initial={initial} cities={CITIES} />
-
-      {cities.length > 1 && <CityIftars cities={cities} className="mt-16 lg:mt-24" />}
+      <PlaceView data={data} fromUrl={fromUrl} quickCities={CITIES} compareCities={cities} />
 
       <section
         aria-labelledby="sss-title"

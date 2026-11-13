@@ -1,28 +1,45 @@
 import "server-only";
-import { getVakitler, resolvePlace } from "@/lib/diyanet";
-import { districtLabel, findCenterDistrict } from "@/lib/turkish";
+import { getIlceler, getIller, getVakitler } from "@/lib/diyanet";
+import { districtLabel, findCenterDistrict, slugify } from "@/lib/turkish";
+
+/**
+ * İl slug'ını il kaydına çevirir. Eski sürümdeki "istanbul-kartal" biçimini de tanır;
+ * o durumda ilçe slug'ı da döner.
+ */
+function findIl(iller, slug) {
+  const exact = iller.find((item) => item.slug === slug);
+  if (exact) return { il: exact, legacyIlce: null };
+
+  const legacy = iller
+    .filter((item) => slug.startsWith(`${item.slug}-`))
+    .sort((a, b) => b.slug.length - a.slug.length)[0];
+  return legacy ? { il: legacy, legacyIlce: slug.slice(legacy.slug.length + 1) } : null;
+}
 
 /**
  * Bir yerin adı ve vakitleri. İlçe verilmezse ya da bulunamazsa il merkezi kullanılır.
  * İl bulunamazsa ya da vakit yoksa null döner.
  */
 export async function loadPlaceTimes(ilSlug, ilceSlug) {
-  const resolved = await resolvePlace(ilSlug, ilceSlug);
-  if (!resolved) return null;
+  const found = findIl(await getIller(), slugify(ilSlug ?? ""));
+  if (!found) return null;
 
-  const { il, ilceler } = resolved;
-  const ilce = resolved.ilce ?? findCenterDistrict(il, ilceler);
+  const { il } = found;
+  const ilceler = await getIlceler(il.id);
+  const wanted = slugify(ilceSlug ?? "") || found.legacyIlce;
+  const ilce = (wanted && ilceler.find((item) => item.slug === wanted)) || findCenterDistrict(il, ilceler);
   if (!ilce) return null;
 
   const days = await getVakitler(ilce.id);
   if (!days.length) return null;
 
+  const isCenter = districtLabel(il, ilce) === "Merkez";
   return {
     place: {
       il: { name: il.name, slug: il.slug },
       ilce: { name: ilce.name, slug: ilce.slug },
-      label: districtLabel(il, ilce) === "Merkez" ? il.name : `${il.name}, ${ilce.name}`,
-      href: `/${il.slug}/${ilce.slug}`,
+      isCenter,
+      label: isCenter ? il.name : `${il.name}, ${ilce.name}`,
     },
     days,
   };

@@ -1,6 +1,7 @@
 import "server-only";
 import { getIlceler, getIller, getVakitler } from "@/lib/diyanet";
 import { findCenterDistrict } from "@/lib/turkish";
+import { placeUrl } from "@/lib/place-url";
 
 /** Batıdan doğuya, karşılaştırma için seçilmiş iller. */
 export const COMPARE_CITIES = [
@@ -41,7 +42,7 @@ export async function getCityIftars(slugs = COMPARE_CITIES) {
         return {
           name: il.name,
           slug: il.slug,
-          href: `/${il.slug}/${center.slug}`,
+          href: placeUrl(il.slug),
           days: days.map((day) => ({ date: day.date, aksam: day.times.aksam })),
         };
       } catch {

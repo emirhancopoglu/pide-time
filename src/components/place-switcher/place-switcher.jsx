@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { detectLocation, LocationError } from "@/lib/geolocation";
 import { districtLabel, findCenterDistrict, slugify } from "@/lib/turkish";
+import { placeUrl } from "@/lib/place-url";
 
 // Satırlar yer değiştirirken hafif bir belirme + kayma
 const SWAP_IN = "animate-in fade-in duration-200 ease-out motion-reduce:animate-none";
@@ -23,7 +24,7 @@ async function fetchJson(url) {
 
 /**
  * Seçili konum, il/ilçe seçimi, cihaz konumu ve hızlı geçiş düğmeleri.
- * place: { il: { slug }, label, href } | null
+ * place: { il: { slug }, label } | null
  * cities: [[ad, slug]]
  * onSelect(ilSlug, ilceSlug?): konumu değiştirir (Promise; başarısızsa reddedilir)
  */
@@ -242,12 +243,7 @@ export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
           <div className="min-w-0 flex-1">
             <p className="text-sm text-muted-foreground">Konumun</p>
             {place ? (
-              <Link
-                href={place.href}
-                className="block truncate font-display text-lg font-semibold hover:underline hover:underline-offset-4"
-              >
-                {place.label}
-              </Link>
+              <p className="truncate font-display text-lg font-semibold">{place.label}</p>
             ) : (
               <p className="font-display text-lg font-semibold">Seçilmedi</p>
             )}
@@ -281,7 +277,7 @@ export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
           return (
             <Link
               key={slug}
-              href={`/${slug}`}
+              href={placeUrl(slug)}
               aria-current={active ? "true" : undefined}
               onClick={(event) => {
                 // Sayfada kalıp geri sayımı değiştir; yeni sekmede açma gibi durumlarda bağlantı çalışsın

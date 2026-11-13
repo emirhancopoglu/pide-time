@@ -86,8 +86,8 @@ export default function FastingChart({ days, className }) {
         Bugün {formatMinutes(first.minutes)}. {trend}
       </p>
 
-      <div className="mt-7 flex flex-col">
-        <div className="relative h-56 sm:h-64">
+      <div className="mt-7 flex flex-1 flex-col">
+        <div className="relative min-h-56 flex-1 sm:min-h-64">
           {/* Izgara ve etiketler */}
           {ticks.map((t) => (
             <div
