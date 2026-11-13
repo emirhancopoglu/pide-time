@@ -12,7 +12,7 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json(
       { error: "İl listesi şu an alınamıyor." },
-      { status: error.status ?? 500 }
+      { status: error.status ?? 500, headers: { "X-Upstream-Status": error.upstreamStatus ?? "unknown" } }
     );
   }
 }

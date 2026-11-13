@@ -6,35 +6,84 @@ const TURKIYE_ID = 2;
 
 const DAY = 60 * 60 * 24;
 
+const HEADERS = {
+  Accept: "application/json",
+  "Accept-Language": "tr-TR,tr;q=0.9",
+  "User-Agent": "PideVakti/1.0",
+};
+
+const MAX_CONCURRENT = 4;
+const MAX_ATTEMPTS = 3;
+const RETRYABLE = new Set([408, 425, 429, 500, 502, 503, 504]);
+
 export class DiyanetApiError extends Error {
-  constructor(message, status) {
+  constructor(message, status, upstreamStatus) {
     super(message);
     this.name = "DiyanetApiError";
     this.status = status;
+    this.upstreamStatus = upstreamStatus;
+  }
+}
+
+let active = 0;
+const waiting = [];
+
+async function withSlot(task) {
+  if (active >= MAX_CONCURRENT) await new Promise((resolve) => waiting.push(resolve));
+  active++;
+  try {
+    return await task();
+  } finally {
+    active--;
+    waiting.shift()?.();
+  }
+}
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function retryDelay(response, attempt) {
+  const header = Number(response?.headers.get("retry-after"));
+  if (header > 0) return Math.min(header * 1000, 3000);
+  return 400 * 3 ** (attempt - 1);
+}
+
+async function fetchOnce(path, revalidate) {
+  try {
+    return await fetch(`${BASE_URL}${path}`, {
+      headers: HEADERS,
+      next: { revalidate },
+      signal: AbortSignal.timeout(8_000),
+    });
+  } catch (error) {
+    throw new DiyanetApiError(`Vakit servisine ulaşılamadı (${path}): ${error.message}`, 503, "network");
   }
 }
 
 async function request(path, revalidate) {
-  let response;
-  try {
-    response = await fetch(`${BASE_URL}${path}`, {
-      headers: { Accept: "application/json" },
-      next: { revalidate },
-      signal: AbortSignal.timeout(10_000),
-    });
-  } catch (error) {
-    throw new DiyanetApiError(`Vakit servisine ulaşılamadı (${path}): ${error.message}`, 503);
-  }
+  for (let attempt = 1; ; attempt++) {
+    let response;
+    try {
+      response = await withSlot(() => fetchOnce(path, revalidate));
+    } catch (error) {
+      if (attempt >= MAX_ATTEMPTS) throw error;
+      await sleep(retryDelay(null, attempt));
+      continue;
+    }
 
-  if (!response.ok) {
-    throw new DiyanetApiError(`Vakit servisi ${response.status} döndü (${path})`, 502);
-  }
+    if (!response.ok) {
+      if (RETRYABLE.has(response.status) && attempt < MAX_ATTEMPTS) {
+        await sleep(retryDelay(response, attempt));
+        continue;
+      }
+      throw new DiyanetApiError(`Vakit servisi ${response.status} döndü (${path})`, 502, String(response.status));
+    }
 
-  const data = await response.json().catch(() => null);
-  if (!Array.isArray(data)) {
-    throw new DiyanetApiError(`Vakit servisi beklenmeyen veri döndü (${path})`, 502);
+    const data = await response.json().catch(() => null);
+    if (!Array.isArray(data)) {
+      throw new DiyanetApiError(`Vakit servisi beklenmeyen veri döndü (${path})`, 502, "invalid-body");
+    }
+    return data;
   }
-  return data;
 }
 
 const toPlace = (id, rawName) => {
