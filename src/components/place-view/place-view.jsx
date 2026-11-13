@@ -26,6 +26,7 @@ import TodayTimes from "@/components/today-times/today-times";
 import FastingChart from "@/components/fasting-chart/fasting-chart";
 import CityIftars from "@/components/city-iftars/city-iftars";
 import ImsakiyeTable from "@/components/imsakiye-table/imsakiye-table";
+import { Bone, CountdownSkeleton, SectionsSkeleton, SkyCardSkeleton } from "./place-skeleton";
 
 const timeFormatter = new Intl.DateTimeFormat("tr-TR", { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit" });
 const hhmm = (date) => timeFormatter.format(date);
@@ -128,6 +129,8 @@ export default function PlaceView({ data, fromUrl, quickCities, compareCities })
     };
   });
 
+  // Saat henüz bilinmiyorsa (ilk açılış) ya da yeni konum yükleniyorsa zamana bağlı parçalar iskelet olur
+  const loading = !now || pending;
   const remaining = status ? splitDuration(status.phase.remaining) : null;
   const upcoming = status ? upcomingTimes(days, now, UPCOMING_COUNT) : [];
   const muted = isIftar ? "text-day-sky-muted" : "text-night-sky-muted";
@@ -168,15 +171,23 @@ export default function PlaceView({ data, fromUrl, quickCities, compareCities })
         )}
       >
         <div className="flex min-w-0 flex-col">
-          <div className={cn("transition-opacity", pending && "opacity-50")} aria-busy={pending}>
-            <p className="figures min-h-5 text-sm text-muted-foreground">
-              {now ? `${formatToday(now)} · Şu an ${hhmm(now)}` : " "}
-            </p>
+          <div aria-busy={loading}>
+            <div className="figures min-h-5 text-sm text-muted-foreground">
+              {loading ? <Bone className="h-4 w-56" /> : `${formatToday(now)} · Şu an ${hhmm(now)}`}
+            </div>
             <h1 className="mt-2 font-display text-[clamp(2.25rem,5vw,3.75rem)] leading-[1.02] font-semibold tracking-[-0.03em] text-balance">
-              {isIftar ? "İftara" : "Sahura"} ne kadar kaldı?
+              {loading ? (
+                <>
+                  <span className="sr-only">İftar ve sahur vakitleri</span>
+                  <Bone className="h-[1.02em] w-[min(100%,34rem)] rounded-xl" />
+                </>
+              ) : (
+                `${isIftar ? "İftara" : "Sahura"} ne kadar kaldı?`
+              )}
             </h1>
 
-            {days.length > 0 && !missingToday && (
+            {loading && days.length > 0 && <CountdownSkeleton />}
+            {!loading && days.length > 0 && !missingToday && (
               <p
                 role="timer"
                 aria-label={status ? `${formatSpoken(status.phase.remaining)} kaldı` : undefined}
@@ -188,10 +199,19 @@ export default function PlaceView({ data, fromUrl, quickCities, compareCities })
               </p>
             )}
 
-            <p className="figures mt-5 min-h-7 text-lg text-pretty text-muted-foreground">{summary}</p>
+            <div className="figures mt-5 min-h-7 text-lg text-pretty text-muted-foreground">
+              {loading && days.length > 0 ? <Bone className="mt-0.5 h-6 w-80 max-w-full" /> : summary}
+            </div>
           </div>
 
-          {place && today && (
+          {place && today && loading && (
+            <div aria-hidden className="mt-5 flex flex-wrap items-center gap-2">
+              <Bone className="h-10 w-40 rounded-full" />
+              <Bone className="h-10 w-32 rounded-full" />
+              <Bone className="h-10 w-24 rounded-full" />
+            </div>
+          )}
+          {place && today && !loading && (
             <div className="mt-5 flex flex-wrap items-center gap-2">
               <ReminderButton iftarAt={status?.iftar.at} sahurAt={status?.sahur.at} placeName={place.label} />
               <CalendarButton
@@ -207,7 +227,8 @@ export default function PlaceView({ data, fromUrl, quickCities, compareCities })
           </div>
         </div>
 
-        {today && (
+        {today && loading && <SkyCardSkeleton />}
+        {today && !loading && (
           <SkyArc
             night={!isIftar}
             progress={status?.phase.progress}
@@ -231,7 +252,7 @@ export default function PlaceView({ data, fromUrl, quickCities, compareCities })
               </div>
             }
             fit
-            className={cn("transition-opacity", pending && "opacity-50")}
+            className="animate-in fade-in duration-300 motion-reduce:animate-none"
           >
             <ol
               aria-label="Sıradaki vakitler"
@@ -268,8 +289,10 @@ export default function PlaceView({ data, fromUrl, quickCities, compareCities })
         )}
       </section>
 
-      {today && (
-        <div className={cn("flex flex-col gap-10 transition-opacity", pending && "opacity-50")}>
+      {/* Şehir değişirken yeni veri gelene kadar iskelet; ilk açılışta sunucudan gelen içerik hemen görünür */}
+      {pending && <SectionsSkeleton />}
+      {today && !pending && (
+        <div className="flex flex-col gap-10">
           <TodayTimes today={today} status={status} />
 
           <div className="grid gap-6 lg:grid-cols-2">
@@ -281,7 +304,7 @@ export default function PlaceView({ data, fromUrl, quickCities, compareCities })
         </div>
       )}
 
-      {!today && compareCities.length > 1 && <CityIftars cities={compareCities} />}
+      {!today && !pending && compareCities.length > 1 && <CityIftars cities={compareCities} />}
     </div>
   );
 }

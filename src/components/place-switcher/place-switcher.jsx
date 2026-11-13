@@ -9,6 +9,20 @@ import { cn } from "@/lib/utils";
 import { detectLocation, LocationError } from "@/lib/geolocation";
 import { districtLabel, findCenterDistrict, slugify } from "@/lib/turkish";
 import { placeUrl } from "@/lib/place-url";
+import { Bone } from "@/components/place-view/place-skeleton";
+
+// İl ve ilçe kutuları (ya da iskeletleri) satırı eşit paylaşır; mobilde yan yana, altta düğmeler
+const SLOT = "min-w-0 flex-1 basis-[calc(50%-0.25rem)] sm:basis-0";
+
+/** Açılır liste yüklenirken onun yerinde duran iskelet */
+function SelectBone({ label }) {
+  return (
+    <span role="status" className={cn(SLOT, "h-11")}>
+      <span className="sr-only">{label}</span>
+      <Bone className="size-full rounded-xl" />
+    </span>
+  );
+}
 
 // Satırlar yer değiştirirken hafif bir belirme + kayma
 const SWAP_IN = "animate-in fade-in duration-200 ease-out motion-reduce:animate-none";
@@ -179,39 +193,51 @@ export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
             </>
           ) : (
             <form onSubmit={handleSubmit} className="contents">
-              <Select value={ilId} onValueChange={handleIlChange} disabled={illerLoading || busy}>
-                <SelectTrigger
-                  autoFocus
-                  className="h-11 min-w-0 flex-1 basis-[calc(50%-0.25rem)] rounded-xl border-0 bg-secondary px-4 text-base shadow-none sm:basis-0"
-                  aria-label="İl seç"
-                >
-                  <SelectValue placeholder={illerLoading ? "Yükleniyor…" : "İl seç"} />
-                </SelectTrigger>
-                <SelectContent className="max-h-72">
-                  {iller.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {illerLoading ? (
+                <SelectBone label="İller yükleniyor" />
+              ) : (
+                <div className={SLOT}>
+                  <Select value={ilId} onValueChange={handleIlChange} disabled={busy}>
+                    <SelectTrigger
+                      autoFocus
+                      className="h-11 w-full rounded-xl border-0 bg-secondary px-4 text-base shadow-none"
+                      aria-label="İl seç"
+                    >
+                      <SelectValue placeholder="İl seç" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-72">
+                      {iller.map((item) => (
+                        <SelectItem key={item.id} value={item.id}>
+                          {item.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
-              <Select value={ilceId} onValueChange={setIlceId} disabled={!ilId || ilcelerLoading || busy}>
-                <SelectTrigger
-                  className="h-11 min-w-0 flex-1 basis-[calc(50%-0.25rem)] rounded-xl border-0 bg-secondary px-4 text-base shadow-none sm:basis-0"
-                  aria-label="İlçe seç"
-                >
-                  <SelectValue placeholder={ilcelerLoading ? "Yükleniyor…" : "İlçe seç"} />
-                </SelectTrigger>
-                <SelectContent className="max-h-72">
-                  {il &&
-                    ilceler.map((item) => (
-                      <SelectItem key={item.id} value={item.id}>
-                        {districtLabel(il, item)}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
+              {ilcelerLoading ? (
+                <SelectBone label="İlçeler yükleniyor" />
+              ) : (
+                <div className={SLOT}>
+                  <Select value={ilceId} onValueChange={setIlceId} disabled={!ilId || busy}>
+                    <SelectTrigger
+                      className="h-11 w-full rounded-xl border-0 bg-secondary px-4 text-base shadow-none"
+                      aria-label="İlçe seç"
+                    >
+                      <SelectValue placeholder="İlçe seç" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-72">
+                      {il &&
+                        ilceler.map((item) => (
+                          <SelectItem key={item.id} value={item.id}>
+                            {districtLabel(il, item)}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <Button
                 type="submit"
@@ -242,7 +268,9 @@ export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-sm text-muted-foreground">Konumun</p>
-            {place ? (
+            {busy ? (
+              <Bone className="mt-1 h-6 w-36" />
+            ) : place ? (
               <p className="truncate font-display text-lg font-semibold">{place.label}</p>
             ) : (
               <p className="font-display text-lg font-semibold">Seçilmedi</p>
