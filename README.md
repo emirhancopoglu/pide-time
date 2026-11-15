@@ -37,52 +37,6 @@ Eski `vakit.vercel.app` API'si kapandığı için Diyanet verilerini sunan **htt
 
 **Konumdan bulma:** Tarayıcı konumu → OpenStreetMap Nominatim (yedek: BigDataCloud) ile ters geokodlama → `province` = il, `town` = ilçe. Diyanet'in ayrı vakit yayımlamadığı ilçelerde (ör. Kadıköy) il merkezinin vakitleri kullanılır.
 
-## Ekran Görüntüleri
-
-
-<p>
-    Light Mode Anasayfa
-</p>
-
-![light-home](https://github.com/user-attachments/assets/91835b71-605c-4e94-b1e1-d6e5b52d5b26)
-
-
-<p>
-Dark Mode Anasayfa
-</p>
-
-![dark-home](https://github.com/user-attachments/assets/866f940f-ff4f-4209-b331-86e2538e9e36)
-
-<p>
-    Light Mode Geri Sayım ve Imsakiye
-</p>
-
-![imsakiye-light](https://github.com/user-attachments/assets/f36f5539-447b-4b19-89cf-5b60f5ec1f0d)
-
-
-<p>
-    Dark Mode Geri Sayım ve Imsakiye
-</p>
-
-![imsakiye-dark](https://github.com/user-attachments/assets/e52488f4-a145-4c71-9c44-aea43a78c3ee)
-
-
-
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
