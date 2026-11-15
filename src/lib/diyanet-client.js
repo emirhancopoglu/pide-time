@@ -43,6 +43,30 @@ const direct = createDiyanetSource(directRequest);
 
 export const loadPlaceTimesInBrowser = direct.loadPlaceTimes;
 
+const CITY_GAP_MS = 400;
+const CITY_RETRY_GAP_MS = 1_500;
+
+export async function loadVakitlerSequentially(ilceIds, onEach) {
+  const failed = [];
+  for (const [index, ilceId] of ilceIds.entries()) {
+    if (index > 0) await sleep(CITY_GAP_MS);
+    try {
+      onEach(ilceId, await direct.getVakitler(ilceId));
+    } catch {
+      failed.push(ilceId);
+    }
+  }
+
+  for (const ilceId of failed) {
+    await sleep(CITY_RETRY_GAP_MS);
+    try {
+      onEach(ilceId, await direct.getVakitler(ilceId));
+    } catch {
+      onEach(ilceId, null);
+    }
+  }
+}
+
 async function withFallback(apiUrl, fallback, failMessage) {
   try {
     return await readArray(apiUrl);
