@@ -53,6 +53,24 @@ function CardSkeleton({ className, children }) {
   return <div className={cn("flex flex-col rounded-3xl bg-card p-5 sm:p-7", className)}>{children}</div>;
 }
 
+export function CityIftarsSkeleton() {
+  return (
+    <CardSkeleton>
+      <Bone className="h-8 w-56" />
+      <Bone className="mt-2 h-5 w-80 max-w-full" />
+      <div className="mt-6 flex flex-col gap-4">
+        {Array.from({ length: 10 }, (_, index) => (
+          <div key={index} className="flex items-center gap-3">
+            <Bone className="h-5 w-24" />
+            <Bone className="h-2 flex-1" />
+            <Bone className="h-5 w-12" />
+          </div>
+        ))}
+      </div>
+    </CardSkeleton>
+  );
+}
+
 export function SectionsSkeleton() {
   return (
     <div aria-hidden className="flex flex-col gap-10">
@@ -75,19 +93,7 @@ export function SectionsSkeleton() {
           <Bone className="mt-2 h-5 w-72 max-w-full" />
           <Bone className="mt-7 min-h-64 flex-1 rounded-2xl" />
         </CardSkeleton>
-        <CardSkeleton>
-          <Bone className="h-8 w-56" />
-          <Bone className="mt-2 h-5 w-80 max-w-full" />
-          <div className="mt-6 flex flex-col gap-4">
-            {Array.from({ length: 10 }, (_, index) => (
-              <div key={index} className="flex items-center gap-3">
-                <Bone className="h-5 w-24" />
-                <Bone className="h-2 flex-1" />
-                <Bone className="h-5 w-12" />
-              </div>
-            ))}
-          </div>
-        </CardSkeleton>
+        <CityIftarsSkeleton />
       </div>
 
       <div>

@@ -1,8 +1,12 @@
+import { cache } from "react";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import { after } from "next/server";
 import AccordionComponent from "@/components/accordion/accordion";
 import PlaceView from "@/components/place-view/place-view";
-import { getCityIftars } from "@/lib/cities";
-import { loadPlaceTimes } from "@/lib/places";
+import { loadCityIftars } from "@/lib/cities";
+import { loadPlaceTimes, withDeadline } from "@/lib/diyanet";
+import { LAST_LOCATION_COOKIE, parseLastLocationCookie } from "@/lib/place-url";
 
 const CITIES = [
   ["İstanbul", "istanbul"],
@@ -18,19 +22,34 @@ const CITIES = [
 ];
 
 const DEFAULT_IL = "istanbul";
+const PLACE_DEADLINE_MS = 5_000;
+
+export const maxDuration = 30;
 
 const param = (value) => (Array.isArray(value) ? value[0] : value) || null;
 
+const loadPlace = cache(async (il, ilce) => {
+  const started = Date.now();
+  try {
+    const data = await withDeadline(loadPlaceTimes(il, ilce), PLACE_DEADLINE_MS, "konum vakitleri");
+    return { data, failed: false };
+  } catch (error) {
+    console.error(
+      "[ara] konum sunucuda yüklenemedi, tarayıcıda denenecek",
+      JSON.stringify({ il, ilce, message: error.message, upstream: error.upstreamStatus, ms: Date.now() - started })
+    );
+    return { data: null, failed: true };
+  }
+});
+
 async function loadPage(searchParams) {
   const query = await searchParams;
-  const il = param(query.il);
-  const ilce = param(query.ilce);
-  try {
-    const data = await loadPlaceTimes(il ?? DEFAULT_IL, ilce);
-    return { data, fromUrl: Boolean(il), failed: false };
-  } catch {
-    return { data: null, fromUrl: Boolean(il), failed: true };
-  }
+  const urlIl = param(query.il);
+  const remembered = urlIl ? null : parseLastLocationCookie((await cookies()).get(LAST_LOCATION_COOKIE)?.value);
+  const il = urlIl ?? remembered?.il ?? DEFAULT_IL;
+  const ilce = urlIl ? param(query.ilce) : (remembered?.ilce ?? null);
+  const { data, failed } = await loadPlace(il, ilce);
+  return { data, failed, fromUrl: Boolean(urlIl), query: { il, ilce } };
 }
 
 export async function generateMetadata({ searchParams }) {
@@ -44,12 +63,23 @@ export async function generateMetadata({ searchParams }) {
 }
 
 export default async function Page({ searchParams }) {
-  const [{ data, fromUrl, failed }, cities] = await Promise.all([loadPage(searchParams), getCityIftars()]);
+  const { data, fromUrl, failed, query } = await loadPage(searchParams);
   if (fromUrl && !data && !failed) notFound();
+
+  const { cities: citiesPromise, finished } = loadCityIftars();
+  after(() => finished);
 
   return (
     <>
-      <PlaceView data={data} fromUrl={fromUrl} quickCities={CITIES} compareCities={cities} />
+      <PlaceView
+        key={`${query.il}/${query.ilce ?? ""}`}
+        data={data}
+        failed={failed}
+        query={query}
+        fromUrl={fromUrl}
+        quickCities={CITIES}
+        citiesPromise={citiesPromise}
+      />
 
       <section
         aria-labelledby="sss-title"

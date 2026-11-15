@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { detectLocation, LocationError } from "@/lib/geolocation";
 import { districtLabel, findCenterDistrict, slugify } from "@/lib/turkish";
 import { placeUrl } from "@/lib/place-url";
+import { fetchIlceler, fetchIller } from "@/lib/diyanet-client";
 import { Bone } from "@/components/place-view/place-skeleton";
 
 const SLOT = "min-w-0 flex-1 basis-[calc(50%-0.25rem)] sm:basis-0";
@@ -23,15 +24,6 @@ function SelectBone({ label }) {
 }
 
 const SWAP_IN = "animate-in fade-in duration-200 ease-out motion-reduce:animate-none";
-
-async function fetchJson(url) {
-  const response = await fetch(url);
-  const data = await response.json().catch(() => null);
-  if (!response.ok || !Array.isArray(data)) {
-    throw new Error(data?.error ?? "Sunucuya ulaşılamadı.");
-  }
-  return data;
-}
 
 export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
   const [open, setOpen] = useState(false);
@@ -54,7 +46,7 @@ export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
     setIllerLoading(true);
     setIllerError(null);
     try {
-      const data = await fetchJson("/api/iller");
+      const data = await fetchIller();
       setIller(data);
       return data;
     } catch (error) {
@@ -92,7 +84,7 @@ export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
     setIlcelerLoading(true);
 
     try {
-      const data = await fetchJson(`/api/ilceler/${value}`);
+      const data = await fetchIlceler(value);
       if (requestId !== ilceRequestRef.current) return;
       setIlceler(data);
       const selectedIl = iller.find((item) => item.id === value);
@@ -133,7 +125,7 @@ export default function PlaceSwitcher({ place, cities, onSelect, pending }) {
         throw new LocationError(`"${province}" için vakit bulunamadı. Lütfen il seç.`);
       }
 
-      const ilceList = await fetchJson(`/api/ilceler/${foundIl.id}`);
+      const ilceList = await fetchIlceler(foundIl.id);
       const exactIlce = districts
         .map((name) => ilceList.find((item) => item.slug === slugify(name)))
         .find(Boolean);

@@ -1,10 +1,11 @@
 "use client";
-import { useEffect, useTransition } from "react";
+import { Suspense, useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useNow } from "@/lib/use-now";
 import { readLastLocation, saveLastLocation } from "@/lib/last-location";
 import { placeUrl } from "@/lib/place-url";
+import { loadPlaceTimesInBrowser } from "@/lib/diyanet-client";
 import { timeLocative } from "@/lib/turkish";
 import {
   PRAYERS,
@@ -24,9 +25,9 @@ import CalendarButton from "@/components/calendar-button/calendar-button";
 import ShareButton from "@/components/share-button/share-button";
 import TodayTimes from "@/components/today-times/today-times";
 import FastingChart from "@/components/fasting-chart/fasting-chart";
-import CityIftars from "@/components/city-iftars/city-iftars";
+import CityComparison from "@/components/city-iftars/city-comparison";
 import ImsakiyeTable from "@/components/imsakiye-table/imsakiye-table";
-import { Bone, CountdownSkeleton, SectionsSkeleton, SkyCardSkeleton } from "./place-skeleton";
+import { Bone, CityIftarsSkeleton, CountdownSkeleton, SectionsSkeleton, SkyCardSkeleton } from "./place-skeleton";
 
 const timeFormatter = new Intl.DateTimeFormat("tr-TR", { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit" });
 const hhmm = (date) => timeFormatter.format(date);
@@ -75,11 +76,35 @@ function Unit({ value, unit, accent }) {
 
 const UPCOMING_COUNT = 3;
 
-export default function PlaceView({ data, fromUrl, quickCities, compareCities }) {
+export default function PlaceView({ data: serverData, failed, query, fromUrl, quickCities, citiesPromise }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const now = useNow();
 
+  const [browserData, setBrowserData] = useState(null);
+  const [browserState, setBrowserState] = useState(failed ? "loading" : "idle");
+
+  useEffect(() => {
+    if (!failed) return;
+    let cancelled = false;
+    loadPlaceTimesInBrowser(query.il, query.ilce)
+      .then((result) => {
+        if (cancelled) return;
+        setBrowserData(result);
+        setBrowserState(result ? "done" : "not-found");
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        console.error("[ara] tarayıcıdan da yüklenemedi", { il: query.il, ilce: query.ilce, message: error?.message });
+        setBrowserState("error");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [failed, query.il, query.ilce]);
+
+  const data = serverData ?? browserData;
+  const fetching = browserState === "loading";
   const days = data?.days ?? [];
   const place = data?.place ?? null;
 
@@ -98,11 +123,14 @@ export default function PlaceView({ data, fromUrl, quickCities, compareCities })
       }
       return;
     }
+    if (fetching) return;
     const last = readLastLocation();
     if (last && (last.il.slug !== ilSlug || last.ilce.slug !== ilceSlug)) {
       startTransition(() => router.replace(placeUrl(last.il.slug, last.ilce.slug), { scroll: false }));
+    } else if (last && ilSlug) {
+      window.history.replaceState(window.history.state, "", placeUrl(ilSlug, ilceSlug));
     }
-  }, [fromUrl, ilSlug, ilName, ilceSlug, ilceName, router]);
+  }, [fromUrl, fetching, ilSlug, ilName, ilceSlug, ilceName, router]);
 
   const status = now && days.length ? getStatus(days, now) : null;
   const missingToday = Boolean(now && days.length && !status);
@@ -118,7 +146,8 @@ export default function PlaceView({ data, fromUrl, quickCities, compareCities })
     };
   });
 
-  const loading = !now || pending;
+  const loading = !now || pending || fetching;
+  const expectsData = days.length > 0 || fetching;
   const remaining = status ? splitDuration(status.phase.remaining) : null;
   const upcoming = status ? upcomingTimes(days, now, UPCOMING_COUNT) : [];
   const muted = isIftar ? "text-day-sky-muted" : "text-night-sky-muted";
@@ -145,8 +174,10 @@ export default function PlaceView({ data, fromUrl, quickCities, compareCities })
     );
   } else if (missingToday) {
     summary = "Bu konum için bugünün vakitleri henüz yayımlanmadı.";
+  } else if (browserState === "not-found") {
+    summary = "Bu konum bulunamadı. Aşağıdan başka bir konum seçebilirsin.";
   } else if (!days.length) {
-    summary = "Vakitler şu an alınamadı. Aşağıdan bir konum seçebilirsin.";
+    summary = "Vakitler şu an alınamadı. Biraz sonra tekrar dene ya da aşağıdan bir konum seç.";
   }
 
   return (
@@ -154,7 +185,7 @@ export default function PlaceView({ data, fromUrl, quickCities, compareCities })
       <section
         className={cn(
           "grid gap-8 pt-8 sm:pt-12 lg:gap-12",
-          today && "lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]"
+          (today || fetching) && "lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]"
         )}
       >
         <div className="flex min-w-0 flex-col">
@@ -173,7 +204,7 @@ export default function PlaceView({ data, fromUrl, quickCities, compareCities })
               )}
             </h1>
 
-            {loading && days.length > 0 && <CountdownSkeleton />}
+            {loading && expectsData && <CountdownSkeleton />}
             {!loading && days.length > 0 && !missingToday && (
               <p
                 role="timer"
@@ -187,7 +218,7 @@ export default function PlaceView({ data, fromUrl, quickCities, compareCities })
             )}
 
             <div className="figures mt-5 min-h-7 text-lg text-pretty text-muted-foreground">
-              {loading && days.length > 0 ? <Bone className="mt-0.5 h-6 w-80 max-w-full" /> : summary}
+              {loading && expectsData ? <Bone className="mt-0.5 h-6 w-80 max-w-full" /> : summary}
             </div>
           </div>
 
@@ -210,11 +241,11 @@ export default function PlaceView({ data, fromUrl, quickCities, compareCities })
           )}
 
           <div className="mt-8">
-            <PlaceSwitcher place={place} cities={quickCities} onSelect={select} pending={pending} />
+            <PlaceSwitcher place={place} cities={quickCities} onSelect={select} pending={pending || fetching} />
           </div>
         </div>
 
-        {today && loading && <SkyCardSkeleton />}
+        {(today || fetching) && loading && <SkyCardSkeleton />}
         {today && !loading && (
           <SkyArc
             night={!isIftar}
@@ -276,21 +307,27 @@ export default function PlaceView({ data, fromUrl, quickCities, compareCities })
         )}
       </section>
 
-      {pending && <SectionsSkeleton />}
+      {(pending || fetching) && <SectionsSkeleton />}
       {today && !pending && (
         <div className="flex flex-col gap-10">
           <TodayTimes today={today} status={status} />
 
           <div className="grid gap-6 lg:grid-cols-2">
             <FastingChart days={days} />
-            {compareCities.length > 1 && <CityIftars cities={compareCities} current={current} />}
+            <Suspense fallback={<CityIftarsSkeleton />}>
+              <CityComparison citiesPromise={citiesPromise} current={current} />
+            </Suspense>
           </div>
 
           <ImsakiyeTable days={days} />
         </div>
       )}
 
-      {!today && !pending && compareCities.length > 1 && <CityIftars cities={compareCities} />}
+      {!today && !pending && !fetching && (
+        <Suspense fallback={<CityIftarsSkeleton />}>
+          <CityComparison citiesPromise={citiesPromise} current={null} />
+        </Suspense>
+      )}
     </div>
   );
 }

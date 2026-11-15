@@ -1,10 +1,5 @@
 import "server-only";
-import { slugify, sortByName, toTitleCase } from "@/lib/turkish";
-
-const BASE_URL = "https://ezanvakti.emushaf.net";
-const TURKIYE_ID = 2;
-
-const DAY = 60 * 60 * 24;
+import { DIYANET_BASE_URL, createDiyanetSource } from "@/lib/diyanet-core";
 
 const HEADERS = {
   Accept: "application/json",
@@ -12,8 +7,9 @@ const HEADERS = {
   "User-Agent": "PideVakti/1.0",
 };
 
-const MAX_CONCURRENT = 4;
-const MAX_ATTEMPTS = 3;
+const ATTEMPT_TIMEOUT_MS = 4_000;
+const BACKGROUND_PAUSE_MS = 20_000;
+const SLOW_MS = 2_000;
 const RETRYABLE = new Set([408, 425, 429, 500, 502, 503, 504]);
 
 export class DiyanetApiError extends Error {
@@ -25,125 +21,165 @@ export class DiyanetApiError extends Error {
   }
 }
 
-let active = 0;
-const waiting = [];
-
-async function withSlot(task) {
-  if (active >= MAX_CONCURRENT) await new Promise((resolve) => waiting.push(resolve));
-  active++;
-  try {
-    return await task();
-  } finally {
-    active--;
-    waiting.shift()?.();
-  }
-}
-
+const log = (level, message, details) => console[level](`[diyanet] ${message}`, JSON.stringify(details));
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function retryDelay(response, attempt) {
-  const header = Number(response?.headers.get("retry-after"));
-  if (header > 0) return Math.min(header * 1000, 3000);
-  return 400 * 3 ** (attempt - 1);
+const lanes = { page: [], background: [] };
+const INTERVAL_MS = { page: 600, background: 1_200 };
+const CACHE_HIT_MS = 15;
+let lastStart = 0;
+let backgroundPausedUntil = 0;
+let timer = null;
+
+function nextLane(now) {
+  if (lanes.page.length) return "page";
+  if (lanes.background.length && now >= backgroundPausedUntil) return "background";
+  return null;
+}
+
+function pump() {
+  clearTimeout(timer);
+  timer = null;
+
+  const now = Date.now();
+  const lane = nextLane(now);
+  if (!lane) {
+    if (lanes.background.length) timer = setTimeout(pump, Math.max(50, backgroundPausedUntil - now));
+    return;
+  }
+
+  timer = setTimeout(() => {
+    timer = null;
+    const current = nextLane(Date.now());
+    const job = current ? lanes[current].shift() : null;
+    if (job) {
+      const before = lastStart;
+      const startedAt = Date.now();
+      lastStart = startedAt;
+      job().then((fromCache) => {
+        if (fromCache && lastStart === startedAt) {
+          lastStart = before;
+          pump();
+        }
+      });
+    }
+    pump();
+  }, Math.max(0, lastStart + INTERVAL_MS[lane] - now));
+}
+
+function schedule(lane, task) {
+  return new Promise((resolve, reject) => {
+    lanes[lane].push(() =>
+      task().then(
+        (result) => {
+          resolve(result);
+          return result.ms < CACHE_HIT_MS;
+        },
+        (error) => {
+          reject(error);
+          return false;
+        }
+      )
+    );
+    pump();
+  });
 }
 
 async function fetchOnce(path, revalidate) {
+  const started = Date.now();
   try {
-    return await fetch(`${BASE_URL}${path}`, {
+    const response = await fetch(`${DIYANET_BASE_URL}${path}`, {
       headers: HEADERS,
       next: { revalidate },
-      signal: AbortSignal.timeout(8_000),
+      signal: AbortSignal.timeout(ATTEMPT_TIMEOUT_MS),
     });
+    return { response, ms: Date.now() - started };
   } catch (error) {
-    throw new DiyanetApiError(`Vakit servisine ulaşılamadı (${path}): ${error.message}`, 503, "network");
+    throw Object.assign(
+      new DiyanetApiError(
+        `Vakit servisine ulaşılamadı (${path}): ${error.message}`,
+        503,
+        error.name === "TimeoutError" ? "timeout" : "network"
+      ),
+      { ms: Date.now() - started }
+    );
   }
 }
 
-async function request(path, revalidate) {
-  for (let attempt = 1; ; attempt++) {
-    let response;
-    try {
-      response = await withSlot(() => fetchOnce(path, revalidate));
-    } catch (error) {
-      if (attempt >= MAX_ATTEMPTS) throw error;
-      await sleep(retryDelay(null, attempt));
-      continue;
-    }
+const inflight = new Map();
 
-    if (!response.ok) {
-      if (RETRYABLE.has(response.status) && attempt < MAX_ATTEMPTS) {
-        await sleep(retryDelay(response, attempt));
+function createRequest(lane) {
+  const maxAttempts = lane === "page" ? 2 : 1;
+
+  async function send(path, revalidate) {
+    for (let attempt = 1; ; attempt++) {
+      let result;
+      try {
+        result = await schedule(lane, () => fetchOnce(path, revalidate));
+      } catch (error) {
+        log("warn", "istek başarısız", { lane, path, attempt, upstream: error.upstreamStatus, ms: error.ms });
+        if (attempt >= maxAttempts) throw error;
         continue;
       }
-      throw new DiyanetApiError(`Vakit servisi ${response.status} döndü (${path})`, 502, String(response.status));
-    }
 
-    const data = await response.json().catch(() => null);
-    if (!Array.isArray(data)) {
-      throw new DiyanetApiError(`Vakit servisi beklenmeyen veri döndü (${path})`, 502, "invalid-body");
+      const { response, ms } = result;
+      if (!response.ok) {
+        if (response.status === 429) backgroundPausedUntil = Date.now() + BACKGROUND_PAUSE_MS;
+        const willRetry = RETRYABLE.has(response.status) && attempt < maxAttempts;
+        log(willRetry ? "warn" : "error", "hatalı yanıt", {
+          lane,
+          path,
+          attempt,
+          status: response.status,
+          ms,
+          cfRay: response.headers.get("cf-ray"),
+          willRetry,
+        });
+        if (willRetry) {
+          await sleep(response.status === 429 ? 1_000 : 300);
+          continue;
+        }
+        throw new DiyanetApiError(`Vakit servisi ${response.status} döndü (${path})`, 502, String(response.status));
+      }
+
+      if (ms > SLOW_MS) log("warn", "yavaş yanıt", { lane, path, attempt, ms });
+
+      const data = await response.json().catch(() => null);
+      if (!Array.isArray(data)) {
+        log("error", "beklenmeyen veri", { lane, path, contentType: response.headers.get("content-type") });
+        throw new DiyanetApiError(`Vakit servisi beklenmeyen veri döndü (${path})`, 502, "invalid-body");
+      }
+      return data;
     }
-    return data;
+  }
+
+  return function request(path, revalidate) {
+    const key = `${lane}:${path}`;
+    if (!inflight.has(key)) {
+      inflight.set(
+        key,
+        send(path, revalidate).finally(() => inflight.delete(key))
+      );
+    }
+    return inflight.get(key);
+  };
+}
+
+export const { getIller, getIlceler, getVakitler, loadPlaceTimes } = createDiyanetSource(createRequest("page"));
+
+export const background = createDiyanetSource(createRequest("background"));
+
+export class DeadlineError extends Error {
+  constructor(label, ms) {
+    super(`${label} ${ms} ms içinde tamamlanmadı`);
+    this.name = "DeadlineError";
   }
 }
 
-const toPlace = (id, rawName) => {
-  const name = toTitleCase(rawName);
-  return { id: String(id), name, slug: slugify(name) };
-};
-
-export async function getIller() {
-  const data = await request(`/sehirler/${TURKIYE_ID}`, 30 * DAY);
-  return sortByName(data.map((item) => toPlace(item.SehirID, item.SehirAdi)));
-}
-
-export async function getIlceler(ilId) {
-  if (!/^\d+$/.test(String(ilId))) return [];
-  const data = await request(`/ilceler/${ilId}`, 30 * DAY);
-  return sortByName(data.map((item) => toPlace(item.IlceID, item.IlceAdi)));
-}
-
-const toIsoDate = (value) => {
-  const [day, month, year] = value.split(".");
-  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-};
-
-const toUtcOffset = (hours = 3) => {
-  const sign = hours < 0 ? "-" : "+";
-  const abs = Math.abs(hours);
-  const h = String(Math.floor(abs)).padStart(2, "0");
-  const m = String(Math.round((abs % 1) * 60)).padStart(2, "0");
-  return `${sign}${h}:${m}`;
-};
-
-export async function getVakitler(ilceId) {
-  if (!/^\d+$/.test(String(ilceId))) return [];
-  const data = await request(`/vakitler/${ilceId}`, DAY / 4);
-
-  return data
-    .filter((item) => item?.MiladiTarihKisa && item?.Imsak && item?.Aksam)
-    .map((item) => ({
-      date: toIsoDate(item.MiladiTarihKisa),
-      offset: toUtcOffset(item.GreenwichOrtalamaZamani),
-      hijri: item.HicriTarihUzun,
-      hijriMonth: Number(item.HicriTarihKisa?.split(".")[1]) || null,
-      times: {
-        imsak: item.Imsak,
-        gunes: item.Gunes,
-        ogle: item.Ogle,
-        ikindi: item.Ikindi,
-        aksam: item.Aksam,
-        yatsi: item.Yatsi,
-      },
-    }))
-    .sort((a, b) => a.date.localeCompare(b.date));
-}
-
-export async function resolvePlace(ilSlug, ilceSlug) {
-  const iller = await getIller();
-  const il = iller.find((item) => item.slug === ilSlug);
-  if (!il) return null;
-
-  const ilceler = await getIlceler(il.id);
-  const ilce = ilceSlug ? ilceler.find((item) => item.slug === ilceSlug) : null;
-  return { il, ilce, ilceler, iller };
+export function withDeadline(promise, ms, label) {
+  let timer;
+  const deadline = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new DeadlineError(label, ms)), ms);
+  });
+  return Promise.race([promise, deadline]).finally(() => clearTimeout(timer));
 }
